@@ -1,12 +1,15 @@
 package com.zewde.newsdAuthentication.controller;
 
+
+import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
+import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
-import org.hibernate.jdbc.Expectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +20,7 @@ import java.util.List;
 public class UserController {
 
   @Autowired
-  UserDetailsServiceImplementation userService;
+  private UserDetailsServiceImplementation userService;
 
 
   @GetMapping("/home")
@@ -31,17 +34,14 @@ public class UserController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> registerUser(@RequestBody User user) throws Exception{
-//    User u;
-//    u = userService.registerUser(user);
-//
-//    return new ResponseEntity<>(u,HttpStatus.CREATED);
-//  }
+  public ResponseEntity<?> registerUser(@RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException {
     User u;
     try{
       u = userService.registerUser(user);
-    }catch(Exception e){
-      throw new Exception("something went wrong");
+    }catch(EmailAlreadyExistException e){
+      throw new EmailAlreadyExistException();
+    } catch(UserNameAlreadyExistException e){
+      throw new UserNameAlreadyExistException();
     }
     return new ResponseEntity<>(u, HttpStatus.CREATED);
   }
