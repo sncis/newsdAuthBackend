@@ -1,12 +1,16 @@
 package com.zewde.newsdAuthentication.controller;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zewde.newsdAuthentication.entities.User;
+import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.results.ResultMatchers;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -15,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
 
 @WebMvcTest
 @RunWith(MockitoJUnitRunner.class)
@@ -24,14 +28,25 @@ public class UserControllerTest {
   @InjectMocks
   private UserController userController;
 
+  @Mock
+  UserDetailsServiceImplementation userService;
+
   private MockMvc mockMvc;
 
-  private String createJsonUser() throws JSONException {
-    JSONObject user = new JSONObject();
-    user.put("userName", "someUser");
-    user.put("password", "pass");
+  private String createUserJson(User u) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    String json = mapper.writeValueAsString(u);
+    return json;
 
-    return user.toString();
+  }
+
+  private User createUser(){
+
+    User u = new User();
+    u.setUserName("someUser");
+    u.setPassword("pass");
+    u.setActive(true);
+    return u;
   }
 
 
@@ -58,9 +73,14 @@ public class UserControllerTest {
 
   @Test
   public void postRegister() throws Exception {
-    String user = createJsonUser();
-    System.out.println(user);
-    mockMvc.perform(MockMvcRequestBuilders.post("/register").contentType(MediaType.APPLICATION_JSON).content(user))
+    User user = createUser();
+
+    String userJSON = createUserJson(user);
+
+    when(userService.registerUser(Matchers.any(User.class))).thenReturn(user);
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        .contentType(MediaType.APPLICATION_JSON).content(userJSON))
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
   }
