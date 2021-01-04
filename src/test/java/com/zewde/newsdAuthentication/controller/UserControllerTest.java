@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -106,7 +107,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldThrowUserNameAlreadyExistsExceptionWHenUserNameAlreadyExists() throws  Exception{
+  public void shouldThrowUserNameAlreadyExistsExceptionWhenUserNameAlreadyExists() throws Exception{
     when(userService.registerUser(any(User.class))).thenThrow(new UserNameAlreadyExistException());
 
     User user = createUser();
@@ -116,6 +117,30 @@ public class UserControllerTest {
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
         .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNameAlreadyExistException));
+
+  }
+
+  @Test
+  public void postLogin() throws Exception{
+    User user = createUser();
+
+    String userJSON = createUserJson(user);
+
+    when(userService.loginUser(any(User.class))).thenReturn(user);
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_JSON).content(userJSON))
+        .andExpect(MockMvcResultMatchers.status().isOk());
+  }
+
+  @Test
+  public void shouldThrowExceptionIfCredentialsAreWrong() throws Exception {
+    when(userService.loginUser).thenThrow(new BadCredentialsException("wrong credentials"));
+    User user = createUser();
+
+    String userJSON = createUserJson(user);
+    mockMvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_JSON).content(userJSON))
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(result ->assertTrue(result.getResolvedException() instanceof BadCredentialsException));
 
   }
 

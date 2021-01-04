@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -26,6 +27,15 @@ public class UserDetailsServiceImplementationTest {
   @Mock
   private UserRepository userRepository;
 
+  private User createUser(){
+    User u = new User();
+    u.setPassword("testPass");
+    u.setEmail("test@email.com");
+    u.setUserName("testUser");
+
+    return u;
+  }
+
   @Test
   public void loadUserByUsername() {
 
@@ -33,15 +43,12 @@ public class UserDetailsServiceImplementationTest {
 
   @Test
   public void registerUser() {
-    User u = new User();
-    u.setPassword("testPass");
-    u.setEmail("test@email.com");
-    u.setUserName("testUser");
+    User u = createUser();
 
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(null);
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.empty());
 
-    when(userRepository.save(any(User.class))).thenReturn(u);
+    when(userRepository.save(any(User.class))).thenReturn(createUser());
 
     User registeredUser = userDetailsServiceImplementation.registerUser(u);
 
@@ -53,10 +60,7 @@ public class UserDetailsServiceImplementationTest {
 
   @Test(expected = EmailAlreadyExistException.class)
   public void shouldThrowEmailAlreadyExistExceptionEmailAlreadyExist() {
-    User u = new User();
-    u.setPassword("testPass");
-    u.setEmail("test@email.com");
-    u.setUserName("testUser");
+    User u = createUser();
 
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(u);
 
@@ -66,14 +70,32 @@ public class UserDetailsServiceImplementationTest {
 
   @Test(expected = UserNameAlreadyExistException.class)
   public void shouldThrowUserNameAlreadyExistExceptionWhenUserNameExists(){
-    User u = new User();
-    u.setPassword("testPass");
-    u.setEmail("test@email.com");
-    u.setUserName("testUser");
+    User u = createUser();
+
 
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
 
     userDetailsServiceImplementation.registerUser(u);
+
+  }
+
+  @Test
+  public void loginUser(){
+    User u = createUser();
+    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+
+    User loginUser = userDetailsServiceImplementation.loginUser(u);
+
+    assertEquals(loginUser.getUserName(), "testUser");
+
+  }
+
+  @Test(expected = UsernameNotFoundException.class)
+  public void shouldThrowUsernameNotFoundExceptionWhenWrongUsername(){
+    when(userRepository.findByUserName(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
+
+    userDetailsServiceImplementation.loginUser(u);
+
 
   }
 }
