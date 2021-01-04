@@ -8,6 +8,7 @@ import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +17,9 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -28,10 +31,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
@@ -47,6 +51,9 @@ public class UserControllerTest {
 
   @Mock
   private AuthenticationManager authenticationManager;
+
+  @Mock
+  private JWTTokenUtils jwtTokenUtils;
 
   private MockMvc mockMvc;
 
@@ -131,19 +138,22 @@ public class UserControllerTest {
 
   @Test
   public void postLogin() throws Exception {
+    User u = createUser();
+    String json = createUserJson(u);
     Authentication auth = mock(Authentication.class);
+    MyUserDetails userDetails = new MyUserDetails(u);
 
-    User user = createUser();
-
-    String userJSON = createUserJson(user);
-    MyUserDetails userDetails = new MyUserDetails(user);
-
+    when(authenticationManager.authenticate(Matchers.any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
     when(userService.loginUser(any(User.class))).thenReturn(userDetails);
+    when(jwtTokenUtils.generateToken(any(String.class))).thenReturn("some token");
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_JSON).content(userJSON))
+    mockMvc.perform(MockMvcRequestBuilders.post("/login")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json))
         .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("someUser"));
+        .andExpect(MockMvcResultMatchers.jsonPath("$.jwtToken").value("some token"));
   }
+
 
   @Test(expected = BadCredentialsException.class)
   public void shouldThrowBadCredentialsExceptionIfCredentialsAreWrong(){

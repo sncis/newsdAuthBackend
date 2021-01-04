@@ -3,9 +3,11 @@ package com.zewde.newsdAuthentication.controller;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
+import com.zewde.newsdAuthentication.entities.JWTResponseUser;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.web.servlet.oauth2.client.OAuth2ClientSecurityMarker;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @CrossOrigin(origins = { "http://localhost:3000" ,"http://192.168.2.105:3000"})
 @RestController
@@ -29,6 +28,9 @@ public class UserController {
 
   @Autowired
   private AuthenticationManager authManager;
+
+  @Autowired
+  private JWTTokenUtils jwtTokenUtils;
 
 
   @GetMapping("/home")
@@ -65,8 +67,10 @@ public class UserController {
     }
 
     MyUserDetails u = userService.loginUser(user);
+    String token = jwtTokenUtils.generateToken(u.getUsername());
 
-    return new ResponseEntity<>(u, HttpStatus.OK);
+
+    return new ResponseEntity<>(new JWTResponseUser(token), HttpStatus.OK);
 
   }
 
