@@ -2,6 +2,7 @@ package com.zewde.newsdAuthentication.service;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
+import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.UserRepository;
 import org.junit.Test;
@@ -61,7 +62,6 @@ public class UserDetailsServiceImplementationTest {
   @Test(expected = EmailAlreadyExistException.class)
   public void shouldThrowEmailAlreadyExistExceptionEmailAlreadyExist() {
     User u = createUser();
-
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(u);
 
     userDetailsServiceImplementation.registerUser(u);
@@ -71,8 +71,6 @@ public class UserDetailsServiceImplementationTest {
   @Test(expected = UserNameAlreadyExistException.class)
   public void shouldThrowUserNameAlreadyExistExceptionWhenUserNameExists(){
     User u = createUser();
-
-
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
 
     userDetailsServiceImplementation.registerUser(u);
@@ -82,11 +80,12 @@ public class UserDetailsServiceImplementationTest {
   @Test
   public void loginUser(){
     User u = createUser();
+
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
 
-    User loginUser = userDetailsServiceImplementation.loginUser(u);
+    MyUserDetails loginUser = userDetailsServiceImplementation.loginUser(u);
 
-    assertEquals(loginUser.getUserName(), "testUser");
+    assertEquals(loginUser.getUsername(), "testUser");
 
   }
 
@@ -94,7 +93,7 @@ public class UserDetailsServiceImplementationTest {
   public void shouldThrowUsernameNotFoundExceptionWhenWrongUsername(){
     when(userRepository.findByUserName(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
 
-    userDetailsServiceImplementation.loginUser(u);
+    userDetailsServiceImplementation.loginUser(createUser());
 
 
   }

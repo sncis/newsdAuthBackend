@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
+import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 
@@ -16,7 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -26,7 +31,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest
@@ -38,6 +44,9 @@ public class UserControllerTest {
 
   @Mock
   private UserDetailsServiceImplementation userService;
+
+  @Mock
+  private AuthenticationManager authenticationManager;
 
   private MockMvc mockMvc;
 
@@ -121,26 +130,40 @@ public class UserControllerTest {
   }
 
   @Test
-  public void postLogin() throws Exception{
+  public void postLogin() throws Exception {
+    Authentication auth = mock(Authentication.class);
+
     User user = createUser();
 
     String userJSON = createUserJson(user);
+    MyUserDetails userDetails = new MyUserDetails(user);
 
-    when(userService.loginUser(any(User.class))).thenReturn(user);
+    when(userService.loginUser(any(User.class))).thenReturn(userDetails);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_JSON).content(userJSON))
-        .andExpect(MockMvcResultMatchers.status().isOk());
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("someUser"));
   }
 
-  @Test
-  public void shouldThrowExceptionIfCredentialsAreWrong() throws Exception {
-    when(userService.loginUser).thenThrow(new BadCredentialsException("wrong credentials"));
+  @Test(expected = BadCredentialsException.class)
+  public void shouldThrowBadCredentialsExceptionIfCredentialsAreWrong(){
+    when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Bad creds"));
     User user = createUser();
 
-    String userJSON = createUserJson(user);
-    mockMvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_JSON).content(userJSON))
-        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-        .andExpect(result ->assertTrue(result.getResolvedException() instanceof BadCredentialsException));
+    userController.loginUser(user);
+
+    verify(userService, never()).loginUser(user);
+
+  }
+
+  @Test(expected = DisabledException.class)
+  public void shouldThrowDisabledExceptionIfUserIsDisabled(){
+    when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new DisabledException("User disabled"));
+    User user = createUser();
+
+    userController.loginUser(user);
+
+    verify(userService, never()).loginUser(user);
 
   }
 
