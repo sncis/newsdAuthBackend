@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -28,6 +29,9 @@ public class UserDetailsServiceImplementationTest {
   @Mock
   private UserRepository userRepository;
 
+  @Mock
+  private BCryptPasswordEncoder passwordEncoder;
+
   private User createUser(){
     User u = new User();
     u.setPassword("testPass");
@@ -39,6 +43,12 @@ public class UserDetailsServiceImplementationTest {
 
   @Test
   public void loadUserByUsername() {
+    User u = createUser();
+    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+
+    MyUserDetails userDetails = userDetailsServiceImplementation.loadUserByUsername(u.getUserName());
+
+    assertEquals(userDetails.getUsername(),"testUser");
 
   }
 
@@ -48,8 +58,8 @@ public class UserDetailsServiceImplementationTest {
 
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(null);
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.empty());
-
-    when(userRepository.save(any(User.class))).thenReturn(createUser());
+    when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+    when(userRepository.save(any(User.class))).thenReturn(u);
 
     User registeredUser = userDetailsServiceImplementation.registerUser(u);
 

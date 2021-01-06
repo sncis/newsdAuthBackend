@@ -40,6 +40,13 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   }
 
 
+  public User createUserByUsername(String userName){
+    Optional<User> user = userRepository.findByUserName(userName);
+    user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
+
+     return user.map(User::new).get();
+
+  }
 
   public User registerUser(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {
 
