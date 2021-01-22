@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +70,7 @@ public class UserDetailsServiceImplementationTest {
   }
 
   @Test(expected = EmailAlreadyExistException.class)
-  public void shouldThrowEmailAlreadyExistExceptionEmailAlreadyExist() {
+  public void register_shouldThrowEmailAlreadyExistException_WhenEmailAlreadyExist() {
     User u = createUser();
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(u);
 
@@ -79,7 +79,7 @@ public class UserDetailsServiceImplementationTest {
   }
 
   @Test(expected = UserNameAlreadyExistException.class)
-  public void shouldThrowUserNameAlreadyExistExceptionWhenUserNameExists(){
+  public void register_shouldThrowUserNameAlreadyExistException_WhenUserNameExists(){
     User u = createUser();
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
 
@@ -100,11 +100,28 @@ public class UserDetailsServiceImplementationTest {
   }
 
   @Test(expected = UsernameNotFoundException.class)
-  public void shouldThrowUsernameNotFoundExceptionWhenWrongUsername(){
+  public void login_shouldThrowUsernameNotFoundException_WhenWrongUsername(){
     when(userRepository.findByUserName(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
 
     userDetailsServiceImplementation.loginUser(createUser());
 
+  }
+
+  @Test
+  public void createUserByUsername(){
+    User u = createUser();
+    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+
+    User createdUser = userDetailsServiceImplementation.createUserByUsername(u.getUserName());
+    assertEquals(createdUser.getUserName(), u.getUserName());
+  }
+
+  @Test(expected = UsernameNotFoundException.class)
+  public void create_ShouldThrowUsernameNotFoundException(){
+    when(userRepository.findByUserName(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
+
+    userDetailsServiceImplementation.loginUser(createUser());
 
   }
+
 }

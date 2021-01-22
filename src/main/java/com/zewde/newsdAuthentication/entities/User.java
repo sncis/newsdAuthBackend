@@ -7,6 +7,7 @@ import java.util.List;
 @Entity
 @Table(name="users")
 public class User implements Serializable {
+  private static final long serialVersionUID = -3413465874290419237L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,6 +32,13 @@ public class User implements Serializable {
   private List<Role> roles;
 
   public User(){};
+
+  public User(User u){
+    this.userName = u.getUserName();
+    this.password = u.getPassword();
+    this.email = u.getEmail();
+    this.id = u.getId();
+  }
 
   public int getId() {
     return id;

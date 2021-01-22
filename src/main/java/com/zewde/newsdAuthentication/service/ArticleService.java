@@ -1,9 +1,6 @@
 package com.zewde.newsdAuthentication.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zewde.newsdAuthentication.entities.Article;
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
-import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,12 +26,18 @@ public class ArticleService {
 
     try{
       userId = userService.createUserByUsername(userName).getId();
-      articles = articleRepository.loadArticleByUserId(userId);
+      articles = articleRepository.findAllByUserId(userId);
+//      articles = articleRepository.findAllArticlesByUserId(userId);
     }catch(UsernameNotFoundException e){
       throw new UsernameNotFoundException("no such user");
     }
 
     return articles;
+
+  }
+
+  public void deleteUnbookmarkArticle(int articleId){
+
 
   }
 

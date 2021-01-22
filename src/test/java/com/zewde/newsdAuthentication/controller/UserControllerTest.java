@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -82,14 +83,14 @@ public class UserControllerTest {
 
   @Test
   public void home() throws Exception{
-    mockMvc.perform(MockMvcRequestBuilders.get("/home"))
+    mockMvc.perform(MockMvcRequestBuilders.get("/home").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(content().string("hello at home"));
+        .andExpect(content().string("hello from backend home"));
   }
 
   @Test
   public void getRegister() throws Exception{
-    mockMvc.perform(MockMvcRequestBuilders.get("/register"))
+    mockMvc.perform(MockMvcRequestBuilders.get("/register").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(content().string("please register"));
   }
@@ -109,7 +110,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldThrowEmailAlreadyExistExceptionIfUserTryToRegisterWithExistingEmail() throws Exception {
+  public void shouldThrowEmailAlreadyExistException_WhenUserTryToRegisterWithExistingEmail() throws Exception {
     when(userService.registerUser(any(User.class))).thenThrow(new EmailAlreadyExistException());
 
     User user = createUser();
@@ -118,12 +119,12 @@ public class UserControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.post("/register").contentType(MediaType.APPLICATION_JSON).content(userJSON))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Email already exists"))
-        .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailAlreadyExistException));
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
 
   }
 
   @Test
-  public void shouldThrowUserNameAlreadyExistsExceptionWhenUserNameAlreadyExists() throws Exception{
+  public void shouldThrowUserNameAlreadyExistsException_WhenUsernameAlreadyExists() throws Exception{
     when(userService.registerUser(any(User.class))).thenThrow(new UserNameAlreadyExistException());
 
     User user = createUser();
@@ -132,7 +133,7 @@ public class UserControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.post("/register").contentType(MediaType.APPLICATION_JSON).content(userJSON))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
-        .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNameAlreadyExistException));
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
 
   }
 
@@ -143,7 +144,7 @@ public class UserControllerTest {
     Authentication auth = mock(Authentication.class);
     MyUserDetails userDetails = new MyUserDetails(u);
 
-    when(authenticationManager.authenticate(Matchers.any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
+    when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
     when(userService.loginUser(any(User.class))).thenReturn(userDetails);
     when(jwtTokenUtils.generateToken(any(String.class))).thenReturn("some token");
 
@@ -155,8 +156,8 @@ public class UserControllerTest {
   }
 
 
-  @Test(expected = BadCredentialsException.class)
-  public void shouldThrowBadCredentialsExceptionIfCredentialsAreWrong(){
+  @Test(expected = ResponseStatusException.class)
+  public void shouldThrowBadCredentialsException_WhenCredentialsAreWrong(){
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Bad creds"));
     User user = createUser();
 
@@ -166,8 +167,8 @@ public class UserControllerTest {
 
   }
 
-  @Test(expected = DisabledException.class)
-  public void shouldThrowDisabledExceptionIfUserIsDisabled(){
+  @Test(expected = ResponseStatusException.class)
+  public void shouldThrowDisabledException_WhenUserIsDisabled(){
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new DisabledException("User disabled"));
     User user = createUser();
 
