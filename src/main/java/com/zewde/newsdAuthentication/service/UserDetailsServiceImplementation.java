@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -32,6 +31,14 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
     return user.map(MyUserDetails::new).get();
+  }
+
+  public int findUserIdByUsername(String username){
+    Optional<User> user = userRepository.findByUserName(username);
+
+    user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
+
+    return user.get().getId();
   }
 
 

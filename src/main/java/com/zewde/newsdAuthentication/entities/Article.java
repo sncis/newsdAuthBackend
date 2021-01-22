@@ -2,7 +2,6 @@ package com.zewde.newsdAuthentication.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 @Table(name="articles")
@@ -10,7 +9,7 @@ public class Article implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name="article_id")
+  @Column(name="article_id", unique=true)
   private int id;
 
   @Column(name="user_id")

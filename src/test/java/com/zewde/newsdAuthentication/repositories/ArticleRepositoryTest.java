@@ -4,25 +4,20 @@ import com.zewde.newsdAuthentication.entities.Article;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import javax.transaction.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@Transactional
 //@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE) -> use for integration test when you want totest again your actuell database
 public class ArticleRepositoryTest {
 
@@ -45,28 +40,43 @@ public class ArticleRepositoryTest {
   @Test
   public void findAllByUserId() {
     ArrayList<Article> articles = repository.findAllByUserId(1);
-//    System.out.println("****************");
-//    System.out.println(articles.get(0).toString());
-//    System.out.println("****************");
 
-//    assertEquals(articles.get(0).getSource(), "some source");
     assertNotNull(article1);
-
     assertEquals(articles.size(),2);
     assertEquals(article1.getSource(), articles.get(0).getSource());
 
+  }
+  @Test
+  public void shouldReturnEmptyArray_whenNoArticlesByUserId() {
+    ArrayList<Article> articles = repository.findAllByUserId(2);
+
+    assertEquals(articles.size(),0);
 
   }
 
+
   @Test
   public void deleteArticleById() {
-    ArrayList<Article> articles = repository.findAllByUserId(1);
-    assertEquals(articles.size(),2);
+    ArrayList<Article> articles= repository.findAllByUserId(1);
+
+    assertEquals(repository.count(),2);
 
     int articleToDeleteId = articles.get(0).getId();
-
     repository.deleteById(articleToDeleteId);
 
     assertEquals(repository.count(),1);
+  }
+
+  @Test
+  public void shouldCatchEmptyResultAccessException_whenNoArticleWhitGivenId() {
+    ArrayList<Article> articles= repository.findAllByUserId(2);
+
+    try{
+      repository.deleteById(0);
+    }catch(EmptyResultDataAccessException e) {
+      System.out.println("No article with such ID");
+    }
+
+    assertEquals(articles.size(), 0);
   }
 }

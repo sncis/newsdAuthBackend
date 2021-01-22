@@ -1,18 +1,11 @@
 package com.zewde.newsdAuthentication.repositories;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zewde.newsdAuthentication.Exceptions.ArticleNotFoundException;
 import com.zewde.newsdAuthentication.entities.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+
 
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Integer>{
