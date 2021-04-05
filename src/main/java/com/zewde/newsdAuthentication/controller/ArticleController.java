@@ -71,8 +71,6 @@ public class ArticleController {
     }catch(ArticleNotFoundException e){
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,String.format("No Article with id=%s",id),e);
     }
-
-
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

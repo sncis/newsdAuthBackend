@@ -109,7 +109,7 @@ public class ArticleControllerTest {
     when(articleService.deleteUnbookmarkedArticle(any(Integer.class))).thenReturn(true);
 
     mockMvc.perform(MockMvcRequestBuilders.delete("/articles/article?id=1").contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
+        .andExpect(MockMvcResultMatchers.status().isOk());
 
   }
 

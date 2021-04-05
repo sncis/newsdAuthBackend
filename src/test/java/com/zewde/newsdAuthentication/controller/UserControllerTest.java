@@ -82,12 +82,6 @@ public class UserControllerTest {
         .build();
   }
 
-  @Test
-  public void home() throws Exception{
-    mockMvc.perform(MockMvcRequestBuilders.get("/home").contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(content().string("hello from backend home"));
-  }
 
   @Test
   public void getRegister() throws Exception{
@@ -153,7 +147,7 @@ public class UserControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json))
         .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.jwtToken").value("some token"));
+        .andExpect(MockMvcResultMatchers.cookie().httpOnly("jwtToken", true));
   }
 
 

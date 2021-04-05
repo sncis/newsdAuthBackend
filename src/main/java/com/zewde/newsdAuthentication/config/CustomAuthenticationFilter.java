@@ -72,8 +72,5 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
       }
     }
     chain.doFilter(request,response);
-
   }
-
-
 }
