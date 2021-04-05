@@ -119,9 +119,5 @@ public class ArticleControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.delete("/articles/article?id=1").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isNotFound())
           .andExpect(MockMvcResultMatchers.status().reason("No Article with id=1"));
-
   }
-
-
-
 }

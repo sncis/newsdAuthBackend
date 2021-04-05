@@ -53,8 +53,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   public void configure(HttpSecurity http) throws Exception{
     http.cors().and()
-//        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-        .csrf().disable()
+        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+//        .csrf().disable()
         .httpBasic()
         .and()
         .authorizeRequests()
@@ -78,7 +78,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
         "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-    config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type","Access-Control-Allow-Origin","Access-Control-Allow-Headers","Access-Control-Allow-Credentials","Access-Control-Allow-Methods","x-frame-options"));
+    config.setAllowedHeaders(Arrays.asList("Authorization",
+        "Cache-Control", "Content-Type",
+        "Access-Control-Allow-Origin",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Credentials",
+        "Access-Control-Allow-Methods",
+        "x-frame-options",
+        "x-xsrf-token"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
 
