@@ -56,8 +56,6 @@ public class JWTTokenUtils implements Serializable {
     Date expirationDate = claims.getExpiration();
 
     return expirationDate;
-
-
   }
 
   public boolean isTokenExpired(String token){

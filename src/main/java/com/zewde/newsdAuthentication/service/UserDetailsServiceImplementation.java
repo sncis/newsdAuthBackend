@@ -22,7 +22,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   private UserRepository userRepository;
 
   @Autowired
-  BCryptPasswordEncoder passwordEncoder;
+  private BCryptPasswordEncoder passwordEncoder;
 
   @Override
   public MyUserDetails loadUserByUsername(String userName){
@@ -52,7 +52,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
      return user.map(User::new).get();
-
   }
 
   public User registerUser(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {

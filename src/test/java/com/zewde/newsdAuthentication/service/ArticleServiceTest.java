@@ -40,8 +40,8 @@ public class ArticleServiceTest {
 
   @Before
   public void setUp(){
-    Article article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content");
-    Article article2 = new Article(1,"some second source","some  second author","some second title", "some second description","some second url", "some second url to image", "2020-04-09", "some second more content");
+    Article article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content", true);
+    Article article2 = new Article(1,"some second source","some  second author","some second title", "some second description","some second url", "some second url to image", "2020-04-09", "some second more content", true);
 
     articles.add(article1);
     articles.add(article2);

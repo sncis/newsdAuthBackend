@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -160,8 +161,9 @@ public class UserControllerTest {
   public void shouldThrowBadCredentialsException_WhenCredentialsAreWrong(){
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Bad creds"));
     User user = createUser();
+    MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-    userController.loginUser(user);
+    userController.loginUser(user, mockResponse);
 
     verify(userService, never()).loginUser(user);
 
@@ -171,8 +173,9 @@ public class UserControllerTest {
   public void shouldThrowDisabledException_WhenUserIsDisabled(){
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new DisabledException("User disabled"));
     User user = createUser();
+    MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-    userController.loginUser(user);
+    userController.loginUser(user, mockResponse);
 
     verify(userService, never()).loginUser(user);
 

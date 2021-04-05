@@ -12,6 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -45,19 +52,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(HttpSecurity http) throws Exception{
-    http.cors().and().csrf()
-        .disable()
+    http.cors().and()
+//        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        .csrf().disable()
         .httpBasic()
-        .and().authorizeRequests()
-        .antMatchers("/register").permitAll()
-        .antMatchers("/login").permitAll()
+        .and()
+        .authorizeRequests()
+        .antMatchers("/register*").permitAll()
+        .antMatchers("/login*").permitAll()
+        .antMatchers("/test*").permitAll()
         .anyRequest()
         .authenticated().and()
         .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+//        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//        .and()
         .exceptionHandling()
         .authenticationEntryPoint(customeJWTEntryPoint);
 
   }
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource(){
+    final CorsConfiguration config = new CorsConfiguration();
+
+    config.setAllowedOrigins(Arrays.asList("http://localhost:3000" ,"http://192.168.2.105:3000"));
+    config.setAllowCredentials(true);
+    config.setAllowedMethods(Arrays.asList("HEAD",
+        "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type","Access-Control-Allow-Origin","Access-Control-Allow-Headers","Access-Control-Allow-Credentials","Access-Control-Allow-Methods","x-frame-options"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+
+    return source;
+  }
+
+
 }

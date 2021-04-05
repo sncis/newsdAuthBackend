@@ -29,8 +29,8 @@ public class ArticleRepositoryTest {
 
   @Before
   public void setUp(){
-    article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content");
-    article2 = new Article(1,"some second source","some  second author","some second title", "some second description","some second url", "some second url to image", "2020-04-09", "some second more content");
+    article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content", true);
+    article2 = new Article(1,"some second source","some  second author","some second title", "some second description","some second url", "some second url to image", "2020-04-09", "some second more content", true);
 
     repository.save(article1);
     repository.save(article2);

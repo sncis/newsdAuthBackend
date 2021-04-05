@@ -20,10 +20,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 
-@CrossOrigin(origins = { "http://localhost:3000" ,"http://192.168.2.105:3000"})
 @RestController
 @RequestMapping(value="/", consumes = "application/json")
 public class UserController {
@@ -41,11 +41,6 @@ public class UserController {
   @Autowired
   private ArticleService articleService;
 
-
-  @GetMapping("/home")
-  public @ResponseBody String home() {
-    return "hello from backend home";
-  }
 
   @GetMapping("/register")
   public @ResponseBody String getRegister(){
@@ -71,7 +66,7 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<?> loginUser(@RequestBody User user) throws BadCredentialsException, DisabledException{
+  public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response) throws BadCredentialsException, DisabledException{
     System.out.println("user login");
     System.out.println(user);
     try{
@@ -84,18 +79,11 @@ public class UserController {
 
     MyUserDetails u = userService.loginUser(user);
     String token = jwtTokenUtils.generateToken(u.getUsername());
-    return new ResponseEntity<>(new JWTResponseUser(token), HttpStatus.OK);
-
+    Cookie cookie = new Cookie("jwtToken", token);
+    cookie.setSecure(true);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    response.addCookie(cookie);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
-
-//  @GetMapping("/dashboard")
-//  public ResponseEntity<?> getUserInfos(@RequestParam String user){
-//
-//    ArrayList<Article> articles= articleService.getArticlesByUsername(user);
-//
-//    return new ResponseEntity<>(articles, HttpStatus.OK);
-//
-//  }
-
-
 }

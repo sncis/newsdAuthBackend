@@ -43,13 +43,14 @@ public class ArticleService {
   public boolean deleteUnbookmarkedArticle(int articleId) throws ArticleNotFoundException{
 
     try {
+//      articleRepository.deleteArticleByTitle(title);
       articleRepository.deleteById(articleId);
       return true;
     } catch(EmptyResultDataAccessException e) {
       throw new ArticleNotFoundException("No such article");
-
     }
   }
+
 
   public Article saveBookmarkedArticle(Article article){
     try{

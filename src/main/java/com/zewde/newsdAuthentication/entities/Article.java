@@ -40,17 +40,21 @@ public class Article implements Serializable {
   @Column(name="content")
   private String content;
 
+  @Column(name="isbookmarked")
+  private boolean isBookmarked;
+
+
 
   public Article(){
   }
 
-  public Article(int id, String title, String description){
-    this.title = title;
-    this.description = description;
-    this.id =id;
-  }
+//  public Article(int id, String title, String description){
+//    this.title = title;
+//    this.description = description;
+//    this.id =id;
+//  }
 
-  public Article (int userId,String source, String author, String title, String description, String url, String urlToImage,String publishedAt, String content){
+  public Article (int userId,String source, String author, String title, String description, String url, String urlToImage,String publishedAt, String content, boolean isBookmarked){
     this.userId = userId;
     this.source = source;
     this.author = author;
@@ -60,6 +64,7 @@ public class Article implements Serializable {
     this.urlToImage = urlToImage;
     this.publishedAt = publishedAt;
     this.content = content;
+    this.isBookmarked = isBookmarked;
   }
 
 
@@ -119,6 +124,13 @@ public class Article implements Serializable {
     this.content = content;
   }
 
+  public boolean getIsBookmarked() {
+    return isBookmarked;
+  }
+
+  public void setBookmarked(boolean isBookmarked) {
+    this.isBookmarked = isBookmarked;
+  }
 
   public int getId() {
     return id;

@@ -10,10 +10,12 @@ import java.util.ArrayList;
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Integer>{
 
-//  @Query(value = "select * from Articles where user_id = ?1", nativeQuery = true)
+//  @Query(value = "select * from Articles where user_id = ?", nativeQuery = true)
 //  ArrayList<Article> findAllArticlesByUserId(int userId);
 
   void deleteById(int id);
 
   ArrayList<Article> findAllByUserId(int userId);
+
+  void deleteArticleByTitle(String title);
 }
