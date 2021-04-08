@@ -9,6 +9,7 @@ import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 @RestController
-@RequestMapping(value="/", consumes = "application/json")
+@RequestMapping(value="/")
 public class UserController {
 
 
@@ -40,6 +42,9 @@ public class UserController {
 
   @Autowired
   private ArticleService articleService;
+
+  @Autowired
+  private CookiesUtils cookiesUtils;
 
 
   @GetMapping("/register")
@@ -79,11 +84,17 @@ public class UserController {
 
     MyUserDetails u = userService.loginUser(user);
     String token = jwtTokenUtils.generateToken(u.getUsername());
-    Cookie cookie = new Cookie("jwtToken", token);
-    cookie.setSecure(true);
-    cookie.setHttpOnly(true);
-    cookie.setPath("/");
+
+    Cookie cookie = cookiesUtils.createCookie("jwtToken", token);
+    System.out.println(cookie);
     response.addCookie(cookie);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @GetMapping("/logout")
+    public void logout(HttpServletResponse response) throws IOException {
+    System.out.println("logout Called");
+    Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
+    response.addCookie(cookie);
   }
 }

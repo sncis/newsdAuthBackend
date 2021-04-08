@@ -27,14 +27,20 @@ public class ArticleService {
 
   public ArrayList<Article> getArticlesByUsername(String userName) {
     int userId;
-    ArrayList<Article> articles;
+    ArrayList<Article> articles = null;
 
     try{
       userId = userService.createUserByUsername(userName).getId();
       articles = articleRepository.findAllByUserId(userId);
+      System.out.println("*******************");
+      System.out.println(articles);
     }catch(UsernameNotFoundException e){
       throw new UsernameNotFoundException("no such user");
+    }catch(Exception e){
+      System.out.println(e.getMessage());
     }
+
+    System.out.println(articles);
 
     return articles;
 

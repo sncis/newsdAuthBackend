@@ -12,6 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 @RestController
@@ -28,16 +31,27 @@ public class ArticleController {
   JWTTokenUtils jwtTokenUtils;
 
   @GetMapping("/articles")
-  public ResponseEntity<?> getArticlesPerUser(@RequestParam("username") String user){
+  public ResponseEntity<?> getArticlesPerUser(@RequestParam("username") String user, HttpServletRequest req){
     ArrayList<Article> articles;
+    Cookie[] cookies =  req.getCookies();
+    if(cookies != null){
+      for(Cookie c : cookies){
+        System.out.println("cookies from request");
+        System.out.println(c.getName());
+        }
+    }
 
     try{
       articles= articleService.getArticlesByUsername(user);
 
     }catch(UsernameNotFoundException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no such username",e);
-    }
+    }catch(Exception e ){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong",e);
 
+    }
+    System.out.println("artcile in controler");
+    System.out.println(articles);
     return new ResponseEntity<>(articles, HttpStatus.OK);
 
   }
@@ -73,8 +87,6 @@ public class ArticleController {
     }
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
-
 
 }
 

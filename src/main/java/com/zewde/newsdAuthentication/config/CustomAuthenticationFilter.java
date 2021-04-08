@@ -3,6 +3,7 @@ package com.zewde.newsdAuthentication.config;
 
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -32,36 +33,29 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   @Autowired
   JWTTokenUtils JWTTokenUtils;
 
+  @Autowired
+  CookiesUtils cookiesUtils;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
-    String token= null;
     String userName = null;
-    Cookie[] cookies =  request.getCookies();
-    if(cookies != null){
-      for(Cookie c : cookies){
-        System.out.println(c.getName());
-        System.out.println(c.getValue());
 
-        if(c.getName().equals(("jwtToken"))){
-          token = c.getValue();
-          try{
-            userName = JWTTokenUtils.getUsernameFromToken(token);
-          }catch(IllegalArgumentException e){
-            logger.warn("unable to get JWT Token ");
-            Cookie cookie = new Cookie("jwtToken", "");
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
-          }catch(ExpiredJwtException e){
-            logger.warn("JWT Token is expired");
-            Cookie cookie = new Cookie("jwtToken", "");
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
-          }
+    String token = cookiesUtils.getTokenFromCookies("jwtToken",request.getCookies());
+    if(token != null){
+      try{
+        userName = JWTTokenUtils.getUsernameFromToken(token);
+      }catch(IllegalArgumentException e){
+        logger.warn("unable to get JWT Token ");
 
-        }
+        Cookie cookie = cookiesUtils.createCookie("jwtToken", "", 0);
+        response.addCookie(cookie);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
+      }catch(ExpiredJwtException e){
+        logger.warn("JWT Token is expired");
+
+        Cookie cookie = cookiesUtils.createCookie("jwtToken", "", 0);
+        response.addCookie(cookie);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
       }
     }
 

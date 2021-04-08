@@ -8,6 +8,7 @@ import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 
+import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +34,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.servlet.http.Cookie;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -57,6 +61,9 @@ public class UserControllerTest {
   @Mock
   private JWTTokenUtils jwtTokenUtils;
 
+  @Mock
+  private CookiesUtils cookiesUtils;
+
   private MockMvc mockMvc;
 
   private String createUserJson(User u) throws JsonProcessingException {
@@ -70,6 +77,7 @@ public class UserControllerTest {
     User u = new User();
     u.setUserName("someUser");
     u.setPassword("pass");
+    u.setEmail("some@email.com");
     u.setActive(true);
     return u;
   }
@@ -138,16 +146,18 @@ public class UserControllerTest {
     String json = createUserJson(u);
     Authentication auth = mock(Authentication.class);
     MyUserDetails userDetails = new MyUserDetails(u);
+    Cookie cookie = new Cookie("jwtToken", "some value");
 
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
     when(userService.loginUser(any(User.class))).thenReturn(userDetails);
     when(jwtTokenUtils.generateToken(any(String.class))).thenReturn("some token");
+    when(cookiesUtils.createCookie(any(String.class), any(String.class))).thenReturn(cookie);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/login")
         .contentType(MediaType.APPLICATION_JSON)
         .content(json))
         .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.cookie().httpOnly("jwtToken", true));
+        .andExpect(MockMvcResultMatchers.cookie().exists("jwtToken"));
   }
 
 
