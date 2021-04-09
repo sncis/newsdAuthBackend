@@ -25,9 +25,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+//@RequestMapping(value="/", consumes="text/plain; charset: utf-8;application/json")
 
 @RestController
-@RequestMapping(value="/")
+@RequestMapping(value="/",consumes="application/json")
 public class UserController {
 
 
@@ -92,9 +93,10 @@ public class UserController {
   }
 
   @GetMapping("/logout")
-    public void logout(HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> logout(HttpServletResponse response) {
     System.out.println("logout Called");
     Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
     response.addCookie(cookie);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }
