@@ -93,7 +93,7 @@ public class UserController {
   }
 
   @GetMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+  public ResponseEntity<?> logout(HttpServletResponse response) {
     System.out.println("logout Called");
     Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
     response.addCookie(cookie);
