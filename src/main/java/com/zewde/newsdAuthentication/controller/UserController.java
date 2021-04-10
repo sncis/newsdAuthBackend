@@ -3,8 +3,6 @@ package com.zewde.newsdAuthentication.controller;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.Article;
-import com.zewde.newsdAuthentication.entities.JWTResponseUser;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
@@ -23,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.validation.Valid;
 
 //@RequestMapping(value="/", consumes="text/plain; charset: utf-8;application/json")
 
@@ -54,7 +52,7 @@ public class UserController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> registerUser(@RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException {
+  public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException {
     User u;
     System.out.println("user form fronted");
     System.out.println(user);

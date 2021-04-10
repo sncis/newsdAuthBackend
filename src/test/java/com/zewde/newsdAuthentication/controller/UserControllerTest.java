@@ -7,21 +7,16 @@ import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
-
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,19 +24,16 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
@@ -76,7 +68,7 @@ public class UserControllerTest {
   private User createUser(){
     User u = new User();
     u.setUserName("someUser");
-    u.setPassword("pass");
+    u.setPassword("Pass123!");
     u.setEmail("some@email.com");
     u.setActive(true);
     return u;
@@ -110,6 +102,23 @@ public class UserControllerTest {
         .contentType(MediaType.APPLICATION_JSON).content(userJSON))
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
+  }
+
+  @Test
+  public void shouldThrowErrorWhenNoValidCredentials()throws Exception {
+    User user = new User();
+    user.setUserName("");
+    user.setPassword("somepass");
+    user.setEmail("");
+    String userJSON = createUserJson(user);
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        .contentType(MediaType.APPLICATION_JSON).content(userJSON))
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
+
+
+
   }
 
   @Test

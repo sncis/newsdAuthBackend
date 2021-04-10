@@ -13,6 +13,7 @@ public class AppConfig {
     return new BCryptPasswordEncoder();
   }
 
-
+//  @Bean
+//  CustomAuthenticationFilter customAuthenticationFilter(){return new CustomAuthenticationFilter();}
 
 }
