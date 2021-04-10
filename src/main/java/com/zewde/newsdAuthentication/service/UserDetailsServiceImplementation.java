@@ -3,7 +3,9 @@ package com.zewde.newsdAuthentication.service;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
+import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
+import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenRepo;
 import com.zewde.newsdAuthentication.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +26,12 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   @Autowired
   private BCryptPasswordEncoder passwordEncoder;
 
+  @Autowired
+  private RegistrationConfirmationTokenRepo registrationTokenRepo;
+
+
+  @Autowired
+  private RegistrationConfirmationTokenService registrationTokenService;
   @Override
   public MyUserDetails loadUserByUsername(String userName){
     Optional<User> user = userRepository.findByUserName(userName);
@@ -69,7 +77,23 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     newUser.setUserName(u.getUserName());
     newUser.setActive(true);
 
+    RegistrationConfirmationToken registrationToken = new RegistrationConfirmationToken(u);
+
+    registrationTokenRepo.save(registrationToken);
+
     return userRepository.save(newUser);
 
   }
+
+  public void confimrUser(RegistrationConfirmationToken token) {
+    User user = token.getUser();
+    MyUserDetails userDetails = new MyUserDetails(user);
+
+    userDetails.setEnabled(true);
+
+    userRepository.save(user);
+
+    registrationTokenService.deleteToken(token.getId());
+  }
+
 }

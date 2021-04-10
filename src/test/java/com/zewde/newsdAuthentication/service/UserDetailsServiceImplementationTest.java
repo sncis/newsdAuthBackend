@@ -3,7 +3,9 @@ package com.zewde.newsdAuthentication.service;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
+import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
+import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenRepo;
 import com.zewde.newsdAuthentication.repositories.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +15,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +32,9 @@ public class UserDetailsServiceImplementationTest {
 
   @Mock
   private BCryptPasswordEncoder passwordEncoder;
+
+  @Mock
+  private RegistrationConfirmationTokenRepo registrationTokenRepo;
 
   private User createUser(){
     User u = new User();
@@ -55,11 +59,13 @@ public class UserDetailsServiceImplementationTest {
   @Test
   public void registerUser() {
     User u = createUser();
+    RegistrationConfirmationToken token = new RegistrationConfirmationToken();
 
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(null);
     when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.empty());
     when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
     when(userRepository.save(any(User.class))).thenReturn(u);
+    when(registrationTokenRepo.save(any(RegistrationConfirmationToken.class))).thenReturn(token);
 
     User registeredUser = userDetailsServiceImplementation.registerUser(u);
 
