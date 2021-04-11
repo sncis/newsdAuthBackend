@@ -77,15 +77,21 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     newUser.setUserName(u.getUserName());
     newUser.setActive(true);
 
-    RegistrationConfirmationToken registrationToken = new RegistrationConfirmationToken(u);
+    try{
+      userRepository.save(newUser);
+      RegistrationConfirmationToken registrationToken = new RegistrationConfirmationToken(newUser);
+      System.out.println("registration user in registration ");
+      System.out.println(registrationToken);
 
-    registrationTokenRepo.save(registrationToken);
+      registrationTokenRepo.save(registrationToken);
+    }catch(Exception e){
+      System.out.println(e.getMessage());
+    }
 
-    return userRepository.save(newUser);
-
+    return newUser;
   }
 
-  public void confimrUser(RegistrationConfirmationToken token) {
+  public void confirmUser(RegistrationConfirmationToken token) {
     User user = token.getUser();
     MyUserDetails userDetails = new MyUserDetails(user);
 

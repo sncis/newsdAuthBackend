@@ -46,6 +46,8 @@ public class User implements Serializable {
   private Boolean locked = false;
 
 
+
+  @Column(name="enabled")
   private Boolean enabled = false;
 
 
@@ -57,6 +59,7 @@ public class User implements Serializable {
     this.email = u.getEmail();
     this.id = u.getId();
     this.role = u.getRole();
+    this.enabled = u.getEnabled();
   }
 
   public int getId() {
@@ -108,7 +111,21 @@ public class User implements Serializable {
     this.role = role;
   }
 
+  public Boolean getLocked() {
+    return locked;
+  }
 
+  public void setLocked(Boolean locked) {
+    this.locked = locked;
+  }
+
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
 //  public List<Role> getRoles() {
 //    return roles;
 //  }

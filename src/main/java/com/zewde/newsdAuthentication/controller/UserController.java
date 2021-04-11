@@ -2,10 +2,12 @@ package com.zewde.newsdAuthentication.controller;
 
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
+import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
+import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
@@ -26,7 +28,7 @@ import javax.validation.Valid;
 //@RequestMapping(value="/", consumes="text/plain; charset: utf-8;application/json")
 
 @RestController
-@RequestMapping(value="/",consumes="application/json")
+@RequestMapping(value="/")
 public class UserController {
 
 
@@ -45,6 +47,9 @@ public class UserController {
   @Autowired
   private CookiesUtils cookiesUtils;
 
+  @Autowired
+  private RegistrationConfirmationTokenService registrationConfirmationTokenService;
+
 
   @GetMapping("/register")
   public @ResponseBody String getRegister(){
@@ -58,6 +63,8 @@ public class UserController {
     System.out.println(user);
     try{
       u = userService.registerUser(user);
+
+//      userService.registerUser(user);
     }catch(EmailAlreadyExistException e){
       System.out.println(e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists", e);
@@ -66,7 +73,7 @@ public class UserController {
 
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists", e);
     }
-    return new ResponseEntity<>(u, HttpStatus.CREATED);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   @PostMapping("/login")
@@ -95,6 +102,17 @@ public class UserController {
     System.out.println("logout Called");
     Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
     response.addCookie(cookie);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @GetMapping("/confirmeuser")
+  public ResponseEntity<?> confirmUser(@RequestParam("confirmationToken") String token){
+    try{
+      registrationConfirmationTokenService.findToken(token);
+
+    }catch(RegistrationConfirmationTokenNotFoundException ex){
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

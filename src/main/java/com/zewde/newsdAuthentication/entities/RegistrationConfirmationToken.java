@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
+@Table(name="registrationConfirmationToken")
 public class RegistrationConfirmationToken {
 
   public RegistrationConfirmationToken(){}
@@ -18,8 +19,8 @@ public class RegistrationConfirmationToken {
 
   private LocalDate date;
 
-  @OneToOne(targetEntity = User.class)
-  @JoinColumn(nullable =false, name="user_id")
+  @OneToOne(targetEntity = User.class,fetch = FetchType.EAGER)
+  @JoinColumn(nullable=false, name="user_id")
   private User user;
 
   public RegistrationConfirmationToken(User u){

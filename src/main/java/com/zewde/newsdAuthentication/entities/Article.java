@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Article implements Serializable {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name="article_id", unique=true)
   private int id;
 
