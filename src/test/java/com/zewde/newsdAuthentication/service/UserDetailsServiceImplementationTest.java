@@ -9,11 +9,13 @@ import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenR
 import com.zewde.newsdAuthentication.repositories.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
@@ -21,19 +23,21 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles("test")
 public class UserDetailsServiceImplementationTest {
 
-  @InjectMocks
+  @Autowired
   public UserDetailsServiceImplementation userDetailsServiceImplementation;
 
-  @Mock
+  @MockBean
   private UserRepository userRepository;
 
-  @Mock
+  @MockBean
   private BCryptPasswordEncoder passwordEncoder;
 
-  @Mock
+  @MockBean
   private RegistrationConfirmationTokenRepo registrationTokenRepo;
 
   private User createUser(){

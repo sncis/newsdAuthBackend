@@ -8,11 +8,13 @@ import com.zewde.newsdAuthentication.repositories.ArticleRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 
@@ -23,16 +25,18 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles("test")
 public class ArticleServiceTest {
 
-  @InjectMocks
+  @Autowired
   public ArticleService articleService;
 
-  @Mock
+  @MockBean
   private UserDetailsServiceImplementation userDetailsServiceImplementation;
 
-  @Mock
+  @MockBean
   private ArticleRepository articleRepository;
 
   private ArrayList<Article> articles = new ArrayList<>();

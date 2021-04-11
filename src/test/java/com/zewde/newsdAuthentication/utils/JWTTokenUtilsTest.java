@@ -1,8 +1,7 @@
-package com.zewde.newsdAuthentication.config;
+package com.zewde.newsdAuthentication.utils;
 
 import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
-import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

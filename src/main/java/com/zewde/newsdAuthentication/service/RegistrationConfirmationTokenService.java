@@ -17,9 +17,5 @@ public class RegistrationConfirmationTokenService {
 
   public void deleteToken(Long id){
     tokenRepo.deleteById(id);
-
   }
-
-
-
 }
