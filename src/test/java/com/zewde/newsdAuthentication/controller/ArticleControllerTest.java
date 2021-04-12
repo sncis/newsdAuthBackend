@@ -2,10 +2,11 @@ package com.zewde.newsdAuthentication.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zewde.newsdAuthentication.Exceptions.ArticleNotFoundException;
+import com.zewde.newsdAuthentication.config.CustomAuthenticationFilter;
 import com.zewde.newsdAuthentication.entities.Article;
 import com.zewde.newsdAuthentication.service.ArticleService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
-import org.apache.coyote.Response;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,20 +14,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.servlet.http.Cookie;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -40,6 +38,13 @@ public class ArticleControllerTest {
 
   @Mock
   UserDetailsServiceImplementation userService;
+
+  @Mock
+  private CustomAuthenticationFilter filter;
+
+
+  @Mock
+  private JWTTokenUtils jwtTokenUtils;
 
   private MockMvc mockMvc;
 
@@ -57,6 +62,8 @@ public class ArticleControllerTest {
     ArrayList<Article> articles = new ArrayList<>();
     articles.add(article1);
     articles.add(article2);
+    String token = jwtTokenUtils.generateToken("someUser");
+    Cookie c = new Cookie("jwtToken", token);
 
 
     when(articleService.getArticlesByUsername(any(String.class))).thenReturn(articles);

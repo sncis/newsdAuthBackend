@@ -17,7 +17,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @EnableWebSecurity
@@ -50,23 +49,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
   }
 
+
   @Override
   public void configure(HttpSecurity http) throws Exception{
-    http.cors().and()
+
+        http.cors().and()
         .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
-        .httpBasic()
-        .and()
         .authorizeRequests()
-        .antMatchers("/register").permitAll()
-        .antMatchers("/login").permitAll()
-        .antMatchers("/logout").permitAll()
-        .anyRequest()
-        .authenticated().and()
+        .antMatchers("/login","/register","/confirmUser","/logout").permitAll().and().authorizeRequests().anyRequest().authenticated().and()
         .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-        .exceptionHandling()
-        .authenticationEntryPoint(customeJWTEntryPoint);
+        .exceptionHandling().authenticationEntryPoint(customeJWTEntryPoint)
+           .and().httpBasic()
+        ;
+    ;
+    // ntry point is for defining waht to send back when error occures
 
   }
   @Bean
@@ -90,6 +88,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     return source;
   }
+
+
+//  @Bean
+//  public FilterRegistrationBean<CustomAuthenticationFilter> authFilter(){
+//    FilterRegistrationBean<CustomAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
+//    registrationBean.setFilter(authenticationFilter);
+//    registrationBean.addUrlPatterns("/articles**");
+//    return registrationBean;
+//  }
 
 
 }

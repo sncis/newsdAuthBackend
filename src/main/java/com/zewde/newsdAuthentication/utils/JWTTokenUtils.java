@@ -1,6 +1,5 @@
 package com.zewde.newsdAuthentication.utils;
 
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -37,12 +36,13 @@ public class JWTTokenUtils implements Serializable {
 
   }
 
-  public boolean validateToken(MyUserDetails userdetails, String token){
-    String username = getUsernameFromToken(token);
-    boolean isTokenValid = username.equals(userdetails.getUsername()) && !isTokenExpired(token);
+  public boolean validateToken(String username, String token){
+    String user = getUsernameFromToken(token);
+    boolean isTokenValid = user.equals(username) && !isTokenExpired(token);
 
     return isTokenValid;
   }
+
 
   public String getUsernameFromToken(String token){
     Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
@@ -61,8 +61,6 @@ public class JWTTokenUtils implements Serializable {
   public boolean isTokenExpired(String token){
     Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     Date expirationDate = claims.getExpiration();
-    System.out.println("in expiration ");
-    System.out.println(expirationDate.before(new Date()));
     return expirationDate.before(new Date());
   }
 

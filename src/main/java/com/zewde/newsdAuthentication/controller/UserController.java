@@ -4,7 +4,7 @@ package com.zewde.newsdAuthentication.controller;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
+import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
 import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
@@ -58,37 +58,38 @@ public class UserController {
 
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException {
-    User u;
-    System.out.println("user form fronted");
-    System.out.println(user);
-    try{
-      u = userService.registerUser(user);
+//    User u;
+    RegistrationConfirmationToken token;
 
+    try{
+//      u = userService.registerUser(user);
+      token = userService.registerUserAndReturnToken(user);
 //      userService.registerUser(user);
     }catch(EmailAlreadyExistException e){
       System.out.println(e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists", e);
     } catch(UserNameAlreadyExistException e){
       System.out.println(e);
-
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists", e);
     }
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(token,HttpStatus.CREATED);
   }
 
   @PostMapping("/login")
   public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response) throws BadCredentialsException, DisabledException{
-    System.out.println("user login");
-    System.out.println(user);
+
     try{
-      authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
+      authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
     }catch(BadCredentialsException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password", e);
     }catch(DisabledException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is disabled", e);
+    }catch(Exception e){
+      System.out.println(e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "error from backend", e);
     }
 
-    MyUserDetails u = userService.loginUser(user);
+    User u = userService.loginUser(user);
     String token = jwtTokenUtils.generateToken(u.getUsername());
 
     Cookie cookie = cookiesUtils.createCookie("jwtToken", token);
@@ -99,20 +100,25 @@ public class UserController {
 
   @GetMapping("/logout")
   public ResponseEntity<?> logout(HttpServletResponse response) {
-    System.out.println("logout Called");
-    Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
-    response.addCookie(cookie);
-    return new ResponseEntity<>(HttpStatus.OK);
+//    System.out.println("logout Called");
+//    Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
+//    response.addCookie(cookie);
+    return new ResponseEntity<>("is this the boddy",HttpStatus.OK);
   }
 
-  @GetMapping("/confirmeuser")
-  public ResponseEntity<?> confirmUser(@RequestParam("confirmationToken") String token){
+  @GetMapping("/confirmUser")
+  public ResponseEntity<?> confirmUser(@RequestParam("token") String token){
+    System.out.println(token);
     try{
-      registrationConfirmationTokenService.findToken(token);
+      RegistrationConfirmationToken confirmToken =  registrationConfirmationTokenService.getToken(token);
+      System.out.println(confirmToken);
+      userService.confirmUser(confirmToken);
 
     }catch(RegistrationConfirmationTokenNotFoundException ex){
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+      return new ResponseEntity<>(ex,HttpStatus.BAD_REQUEST);
     }
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>("registration confirmation successful",HttpStatus.OK);
+
   }
 }

@@ -30,6 +30,13 @@ public class RegistrationConfirmationToken {
 
   }
 
+  public RegistrationConfirmationToken(RegistrationConfirmationToken token) {
+  this.user = token.getUser();
+  this.date = token.getDate();
+  this.token = token.getToken();
+  this.id = token.getId();
+  }
+
   public Long getId() {
     return id;
   }

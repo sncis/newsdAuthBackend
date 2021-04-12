@@ -20,9 +20,11 @@ public class RegistrationConfirmationTokenService {
   }
 
 
-  public void findToken(String token){
+  public RegistrationConfirmationToken getToken(String token){
     Optional<RegistrationConfirmationToken> confirmationToken = tokenRepo.findRegistrationConfirmationTokenByToken(token);
     confirmationToken.orElseThrow(RegistrationConfirmationTokenNotFoundException::new);
+
+    return confirmationToken.map(RegistrationConfirmationToken::new).get();
 
   }
 

@@ -2,7 +2,6 @@ package com.zewde.newsdAuthentication.service;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenRepo;
@@ -44,7 +43,7 @@ public class UserDetailsServiceImplementationTest {
     User u = new User();
     u.setPassword("testPass");
     u.setEmail("test@email.com");
-    u.setUserName("testUser");
+    u.setUsername("testUser");
 
     return u;
   }
@@ -52,9 +51,9 @@ public class UserDetailsServiceImplementationTest {
   @Test
   public void loadUserByUsername() {
     User u = createUser();
-    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(u));
 
-    MyUserDetails userDetails = userDetailsServiceImplementation.loadUserByUsername(u.getUserName());
+    User userDetails = userDetailsServiceImplementation.loadUserByUsername(u.getUsername());
 
     assertEquals(userDetails.getUsername(),"testUser");
 
@@ -66,7 +65,7 @@ public class UserDetailsServiceImplementationTest {
     RegistrationConfirmationToken token = new RegistrationConfirmationToken();
 
     when(userRepository.findAllByEmail(any(String.class))).thenReturn(null);
-    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.empty());
+    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
     when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
     when(userRepository.save(any(User.class))).thenReturn(u);
     when(registrationTokenRepo.save(any(RegistrationConfirmationToken.class))).thenReturn(token);
@@ -91,7 +90,7 @@ public class UserDetailsServiceImplementationTest {
   @Test(expected = UserNameAlreadyExistException.class)
   public void register_shouldThrowUserNameAlreadyExistException_WhenUserNameExists(){
     User u = createUser();
-    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(u));
 
     userDetailsServiceImplementation.registerUser(u);
 
@@ -101,9 +100,9 @@ public class UserDetailsServiceImplementationTest {
   public void loginUser(){
     User u = createUser();
 
-    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(u));
 
-    MyUserDetails loginUser = userDetailsServiceImplementation.loginUser(u);
+    User loginUser = userDetailsServiceImplementation.loginUser(u);
 
     assertEquals(loginUser.getUsername(), "testUser");
 
@@ -111,7 +110,7 @@ public class UserDetailsServiceImplementationTest {
 
   @Test(expected = UsernameNotFoundException.class)
   public void login_shouldThrowUsernameNotFoundException_WhenWrongUsername(){
-    when(userRepository.findByUserName(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
+    when(userRepository.findByUsername(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
 
     userDetailsServiceImplementation.loginUser(createUser());
 
@@ -120,15 +119,15 @@ public class UserDetailsServiceImplementationTest {
   @Test
   public void createUserByUsername(){
     User u = createUser();
-    when(userRepository.findByUserName(any(String.class))).thenReturn(Optional.of(u));
+    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(u));
 
-    User createdUser = userDetailsServiceImplementation.createUserByUsername(u.getUserName());
-    assertEquals(createdUser.getUserName(), u.getUserName());
+    User createdUser = userDetailsServiceImplementation.createUserByUsername(u.getUsername());
+    assertEquals(createdUser.getUsername(), u.getUsername());
   }
 
   @Test(expected = UsernameNotFoundException.class)
   public void create_ShouldThrowUsernameNotFoundException(){
-    when(userRepository.findByUserName(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
+    when(userRepository.findByUsername(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
 
     userDetailsServiceImplementation.loginUser(createUser());
 

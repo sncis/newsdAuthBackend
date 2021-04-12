@@ -2,15 +2,23 @@ package com.zewde.newsdAuthentication.entities;
 
 import com.zewde.newsdAuthentication.utils.validators.ValidEmail;
 import com.zewde.newsdAuthentication.utils.validators.ValidPassword;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 
 @Entity
 @Table(name="users")
-public class User implements Serializable {
+public class User implements UserDetails {
+
   private static final long serialVersionUID = -3413465874290419237L;
 
   @Id
@@ -27,39 +35,43 @@ public class User implements Serializable {
   @NotNull
   @NotEmpty
   @Column(name="username")
-  private String userName;
+  private String username;
 
   @Column(name="password")
   @ValidPassword
   private String password;
 
-  @Column(name="active")
-  private boolean active;
 
 //  @ManyToMany(cascade = CascadeType.ALL)
 //  @JoinTable(name="user_roles", joinColumns = @JoinColumn(name="user_id"),
 //      inverseJoinColumns = @JoinColumn(name="role_id"))
 //  private List<Role> roles;
-    private UserRole role = UserRole.USER;
+  @Column(name="role")
+  private String role = UserRole.USER.name();
+
+  @Column(name="is_locked")
+  private Boolean isLocked = false;
 
 
-  private Boolean locked = false;
+  @Column(name="is_enabled")
+  private boolean isEnabled = false;
 
+  @Column(name="active")
+  private boolean active;
 
-
-  @Column(name="enabled")
-  private Boolean enabled = false;
+  @Transient
+  private List<GrantedAuthority> authorities = new ArrayList<>();
 
 
   public User(){};
 
   public User(User u){
-    this.userName = u.getUserName();
+    this.id = u.getId();
+    this.username = u.getUsername();
     this.password = u.getPassword();
     this.email = u.getEmail();
-    this.id = u.getId();
     this.role = u.getRole();
-    this.enabled = u.getEnabled();
+    this.isEnabled = u.isEnabled();
   }
 
   public int getId() {
@@ -70,7 +82,6 @@ public class User implements Serializable {
     this.id = id;
   }
 
-
   public String getEmail() {
     return email;
   }
@@ -79,20 +90,29 @@ public class User implements Serializable {
     this.email = email;
   }
 
-  public String getUserName() {
-    return userName;
+  @Override
+  public String getUsername() {
+    return this.username;
+  }
+  public void setUsername(String username) {
+    this.username = username;
   }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-
+  @Override
   public String getPassword() {
-    return password;
+    return this.password;
   }
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 
   public boolean isActive() {
@@ -100,44 +120,55 @@ public class User implements Serializable {
   }
 
   public void setActive(boolean active) {
-    this.active = true;
+    this.active = active;
   }
 
-  public UserRole getRole() {
-    return role;
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    final SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role);
+    return Collections.singletonList(authority);
   }
 
-  public void setRole(UserRole role) {
-    this.role = role;
+  public void setAuthorities(List<GrantedAuthority> authorities) {
+    this.authorities = authorities;
   }
 
-  public Boolean getLocked() {
-    return locked;
+  public boolean isLocked() {
+    return isLocked;
   }
 
-  public void setLocked(Boolean locked) {
-    this.locked = locked;
+  public void setLocked(boolean locked) {
+    isLocked = locked;
   }
 
-  public Boolean getEnabled() {
-    return enabled;
+  @Override
+  public boolean isEnabled() {
+    return isEnabled;
   }
 
-  public void setEnabled(Boolean enabled) {
-    this.enabled = enabled;
+  public void setEnabled(boolean enabled) {
+    isEnabled = enabled;
   }
-//  public List<Role> getRoles() {
-//    return roles;
-//  }
-//
-//  public void setRoles(List<Role> roles) {
-//    this.roles = roles;
-//  }
 
 
   @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return !isLocked;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
   public String toString(){
-    return String.format("User [userId= %d, userName= %s, email= %s, roles='user']", id,userName, email);
+    return String.format("User [userId= %d, userName= %s, email= %s, roles='user']", id,username, email);
 
   }
 }

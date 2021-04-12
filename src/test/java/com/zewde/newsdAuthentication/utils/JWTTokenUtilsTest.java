@@ -1,6 +1,5 @@
 package com.zewde.newsdAuthentication.utils;
 
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.Before;
@@ -23,11 +22,12 @@ public class JWTTokenUtilsTest {
   private JWTTokenUtils jwtTokenUtils;
 
   private User u = createUser("someUser");
-  private MyUserDetails userDetails = new MyUserDetails(u);
 
-  private User createUser(String userName){
+//  private MyUserDetails userDetails = new MyUserDetails(u);
+
+  private User createUser(String username){
     User u = new User();
-    u.setUserName(userName);
+    u.setUsername(username);
     u.setPassword("pass");
     u.setActive(true);
 
@@ -54,8 +54,8 @@ public class JWTTokenUtilsTest {
 
   @Test
   public void validateToken(){
-   String token = jwtTokenUtils.generateToken(u.getUserName());
-   boolean isValide = jwtTokenUtils.validateToken(userDetails, token);
+   String token = jwtTokenUtils.generateToken(u.getUsername());
+   boolean isValide = jwtTokenUtils.validateToken(u.getUsername(), token);
 
    assertTrue(isValide);
 
@@ -63,7 +63,7 @@ public class JWTTokenUtilsTest {
 
   @Test
   public void isTokenExpired(){
-    String token = jwtTokenUtils.generateToken(u.getUserName());
+    String token = jwtTokenUtils.generateToken(u.getUsername());
     boolean isExipred =jwtTokenUtils.isTokenExpired(token);
 
     assertFalse(isExipred);
@@ -77,7 +77,7 @@ public class JWTTokenUtilsTest {
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm");
 
 
-    String token = jwtTokenUtils.generateToken(u.getUserName());
+    String token = jwtTokenUtils.generateToken(u.getUsername());
 
     Date expirationDate= jwtTokenUtils.getExpirationDateFromToken(token);
     System.out.println(expirationDate);
@@ -100,13 +100,12 @@ public class JWTTokenUtilsTest {
     Long jwtTokenValidity = 2000l;
     ReflectionTestUtils.setField(jwtTokenUtils, "tokenValidity", jwtTokenValidity);
 
-    MyUserDetails uDetails = new MyUserDetails(createUser("someUser"));
-    String token = jwtTokenUtils.generateToken(u.getUserName());
+    String token = jwtTokenUtils.generateToken(u.getUsername());
     Date expirationDate= jwtTokenUtils.getExpirationDateFromToken(token);
     Thread.sleep(6000);
 
     try{
-      jwtTokenUtils.validateToken(userDetails,token);
+      jwtTokenUtils.validateToken(u.getUsername(),token);
       valid = true;
     }catch(ExpiredJwtException e){
       valid = false;
@@ -116,21 +115,22 @@ public class JWTTokenUtilsTest {
     assertThat(expirationDate.before(new Date(System.currentTimeMillis()))).isEqualTo(true);
 
   }
+
   @Test
   public void shouldReturnFalseIfUserNameIsFalseInValidateToken(){
-    MyUserDetails fakeUserDetails = new MyUserDetails(createUser("fakeUser"));
-    String token = jwtTokenUtils.generateToken(u.getUserName());
+    User fakeUser = new User(createUser("fakeUser"));
+    String token = jwtTokenUtils.generateToken(u.getUsername());
     Date exDate = jwtTokenUtils.getExpirationDateFromToken(token);
     boolean valid;
     try{
-      valid = jwtTokenUtils.validateToken(fakeUserDetails,token);
+      valid = jwtTokenUtils.validateToken(fakeUser.getUsername(),token);
     }catch(ExpiredJwtException e){
       valid = true;
     }
 
     System.out.println(exDate);
     assertThat(valid).isEqualTo(false);
-    assertThat(jwtTokenUtils.getUsernameFromToken(token)).isEqualTo(u.getUserName());
+    assertThat(jwtTokenUtils.getUsernameFromToken(token)).isEqualTo(u.getUsername());
   }
 
 }

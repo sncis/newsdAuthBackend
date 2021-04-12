@@ -2,7 +2,6 @@ package com.zewde.newsdAuthentication.service;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenRepo;
@@ -32,17 +31,19 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
   @Autowired
   private RegistrationConfirmationTokenService registrationTokenService;
+
+
   @Override
-  public MyUserDetails loadUserByUsername(String userName){
-    Optional<User> user = userRepository.findByUserName(userName);
+  public User loadUserByUsername(String username){
+    Optional<User> user = userRepository.findByUsername(username);
 
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
-    return user.map(MyUserDetails::new).get();
+    return user.map(User::new).get();
   }
 
   public int findUserIdByUsername(String username){
-    Optional<User> user = userRepository.findByUserName(username);
+    Optional<User> user = userRepository.findByUsername(username);
 
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
@@ -50,13 +51,13 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   }
 
 
-  public MyUserDetails loginUser(User u){
-    return loadUserByUsername(u.getUserName());
+  public User loginUser(User u){
+    return loadUserByUsername(u.getUsername());
   }
 
 
-  public User createUserByUsername(String userName){
-    Optional<User> user = userRepository.findByUserName(userName);
+  public User createUserByUsername(String username){
+    Optional<User> user = userRepository.findByUsername(username);
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
      return user.map(User::new).get();
@@ -64,7 +65,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
   public User registerUser(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {
 
-    if(userRepository.findByUserName(u.getUserName()).isPresent()) {
+    if(userRepository.findByUsername(u.getUsername()).isPresent()) {
       throw new UserNameAlreadyExistException();
 
     }if(userRepository.findAllByEmail(u.getEmail()) != null){
@@ -74,7 +75,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     User newUser = new User();
     newUser.setEmail(u.getEmail());
     newUser.setPassword(passwordEncoder.encode(u.getPassword()));
-    newUser.setUserName(u.getUserName());
+    newUser.setUsername(u.getUsername());
     newUser.setActive(true);
 
     try{
@@ -87,18 +88,46 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     }catch(Exception e){
       System.out.println(e.getMessage());
     }
-
     return newUser;
+  }
+
+
+  public RegistrationConfirmationToken registerUserAndReturnToken(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {
+    RegistrationConfirmationToken registrationToken = null;
+
+    if(userRepository.findByUsername(u.getUsername()).isPresent()) {
+      throw new UserNameAlreadyExistException();
+
+    }if(userRepository.findAllByEmail(u.getEmail()) != null){
+      throw new EmailAlreadyExistException();
+    }
+
+    User newUser = new User();
+    newUser.setEmail(u.getEmail());
+    newUser.setPassword(passwordEncoder.encode(u.getPassword()));
+    newUser.setUsername(u.getUsername());
+    newUser.setActive(true);
+
+    try{
+      userRepository.save(newUser);
+      registrationToken = new RegistrationConfirmationToken(newUser);
+      System.out.println("registration user in registration ");
+      System.out.println(registrationToken);
+
+      registrationTokenRepo.save(registrationToken);
+      return registrationToken;
+    }catch(Exception e){
+      System.out.println(e.getMessage());
+    }
+    return registrationToken;
   }
 
   public void confirmUser(RegistrationConfirmationToken token) {
     User user = token.getUser();
-    MyUserDetails userDetails = new MyUserDetails(user);
 
-    userDetails.setEnabled(true);
+    user.setEnabled(true);
 
     userRepository.save(user);
-
     registrationTokenService.deleteToken(token.getId());
   }
 

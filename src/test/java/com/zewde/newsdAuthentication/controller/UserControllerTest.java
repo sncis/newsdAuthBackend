@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.MyUserDetails;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
@@ -67,7 +66,7 @@ public class UserControllerTest {
 
   private User createUser(){
     User u = new User();
-    u.setUserName("someUser");
+    u.setUsername("someUser");
     u.setPassword("Pass123!");
     u.setEmail("some@email.com");
     u.setActive(true);
@@ -107,7 +106,7 @@ public class UserControllerTest {
   @Test
   public void shouldThrowErrorWhenNoValidCredentials()throws Exception {
     User user = new User();
-    user.setUserName("");
+    user.setUsername("");
     user.setPassword("somepass");
     user.setEmail("");
     String userJSON = createUserJson(user);
@@ -116,9 +115,6 @@ public class UserControllerTest {
         .contentType(MediaType.APPLICATION_JSON).content(userJSON))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
-
-
-
   }
 
   @Test
@@ -154,11 +150,10 @@ public class UserControllerTest {
     User u = createUser();
     String json = createUserJson(u);
     Authentication auth = mock(Authentication.class);
-    MyUserDetails userDetails = new MyUserDetails(u);
     Cookie cookie = new Cookie("jwtToken", "some value");
 
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
-    when(userService.loginUser(any(User.class))).thenReturn(userDetails);
+    when(userService.loginUser(any(User.class))).thenReturn(u);
     when(jwtTokenUtils.generateToken(any(String.class))).thenReturn("some token");
     when(cookiesUtils.createCookie(any(String.class), any(String.class))).thenReturn(cookie);
 

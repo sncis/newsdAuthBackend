@@ -54,13 +54,13 @@ public class ArticleServiceTest {
   @Test
   public void getArticlesByUserName() {
     User user = new User();
-    user.setUserName("someUser");
+    user.setUsername("someUser");
     user.setId(1);
 
     when(userDetailsServiceImplementation.createUserByUsername(any(String.class))).thenReturn(user);
     when(articleRepository.findAllByUserId(any(int.class))).thenReturn(articles);
 
-    ArrayList<Article> expectedArticles = articleService.getArticlesByUsername(user.getUserName());
+    ArrayList<Article> expectedArticles = articleService.getArticlesByUsername(user.getUsername());
 
     assertEquals(expectedArticles.get(0).getTitle(), articles.get(0).getTitle());
 

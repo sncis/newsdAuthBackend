@@ -17,12 +17,12 @@ public class CustomeJWTEntryPoint implements AuthenticationEntryPoint {
 
   @Autowired
   CookiesUtils cookiesUtils;
+
   @Override
   public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException authException)
       throws IOException {
       Cookie cookie = cookiesUtils.createCookie("jwtToken", "", 0);
-
-    res.addCookie(cookie);
-    res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
+      res.addCookie(cookie);
+      res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
   }
 }
