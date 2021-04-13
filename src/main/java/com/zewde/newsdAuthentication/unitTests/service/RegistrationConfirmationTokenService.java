@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.service;
+package com.zewde.newsdAuthentication.unitTests.service;
 
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;

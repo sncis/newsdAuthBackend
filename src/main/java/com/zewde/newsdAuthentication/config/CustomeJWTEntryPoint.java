@@ -1,7 +1,7 @@
 package com.zewde.newsdAuthentication.config;
 
 
-import com.zewde.newsdAuthentication.utils.CookiesUtils;
+import com.zewde.newsdAuthentication.unitTests.utils.CookiesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -23,6 +23,7 @@ public class CustomeJWTEntryPoint implements AuthenticationEntryPoint {
       throws IOException {
       Cookie cookie = cookiesUtils.createCookie("jwtToken", "", 0);
       res.addCookie(cookie);
-      res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User");
+      res.sendError(HttpServletResponse.SC_UNAUTHORIZED,authException.getMessage());
+//      res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User and so one");
   }
 }

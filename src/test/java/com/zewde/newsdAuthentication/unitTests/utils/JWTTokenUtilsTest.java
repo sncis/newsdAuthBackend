@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.utils;
+package com.zewde.newsdAuthentication.unitTests.utils;
 
 import com.zewde.newsdAuthentication.entities.User;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.text.SimpleDateFormat;
@@ -16,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@ActiveProfiles("test")
 public class JWTTokenUtilsTest {
 
   @InjectMocks

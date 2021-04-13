@@ -1,7 +1,7 @@
 package com.zewde.newsdAuthentication.config;
 
-import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -33,6 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   CustomAuthenticationFilter authenticationFilter;
+
+
+  @Autowired
+  LoggingFilter loggingFilter;
 
   @Autowired
   CustomeJWTEntryPoint customeJWTEntryPoint;
@@ -57,7 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
         .antMatchers("/login","/register","/confirmUser","/logout").permitAll().and().authorizeRequests().anyRequest().authenticated().and()
-        .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
+        .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .exceptionHandling().authenticationEntryPoint(customeJWTEntryPoint)
@@ -75,7 +81,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
         "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-    config.setAllowedHeaders(Arrays.asList("Authorization",
+    config.setAllowedHeaders(Arrays.asList("Authorization","Accept",
         "Cache-Control", "Content-Type",
         "Access-Control-Allow-Origin",
         "Access-Control-Allow-Headers",
@@ -88,15 +94,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     return source;
   }
-
-
-//  @Bean
-//  public FilterRegistrationBean<CustomAuthenticationFilter> authFilter(){
-//    FilterRegistrationBean<CustomAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
-//    registrationBean.setFilter(authenticationFilter);
-//    registrationBean.addUrlPatterns("/articles**");
-//    return registrationBean;
-//  }
-
 
 }

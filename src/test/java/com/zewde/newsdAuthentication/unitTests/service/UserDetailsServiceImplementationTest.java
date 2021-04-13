@@ -1,20 +1,19 @@
-package com.zewde.newsdAuthentication.service;
+package com.zewde.newsdAuthentication.unitTests.service;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenRepo;
 import com.zewde.newsdAuthentication.repositories.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
@@ -22,21 +21,21 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class UserDetailsServiceImplementationTest {
 
-  @Autowired
+  @InjectMocks
   public UserDetailsServiceImplementation userDetailsServiceImplementation;
 
-  @MockBean
+  @Mock
   private UserRepository userRepository;
 
-  @MockBean
+  @Mock
   private BCryptPasswordEncoder passwordEncoder;
 
-  @MockBean
+  @Mock
   private RegistrationConfirmationTokenRepo registrationTokenRepo;
 
   private User createUser(){
@@ -59,24 +58,23 @@ public class UserDetailsServiceImplementationTest {
 
   }
 
-  @Test
-  public void registerUser() {
-    User u = createUser();
-    RegistrationConfirmationToken token = new RegistrationConfirmationToken();
-
-    when(userRepository.findAllByEmail(any(String.class))).thenReturn(null);
-    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
-    when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
-    when(userRepository.save(any(User.class))).thenReturn(u);
-    when(registrationTokenRepo.save(any(RegistrationConfirmationToken.class))).thenReturn(token);
-
-//    User registeredUser = userDetailsServiceImplementation.registerUser(u);
-
-
-//    System.out.println(registeredUser.getUserName());
-//    assertEquals(registeredUser.getUserName(), "testUser");
-
-  }
+//  @Test
+//  public void registerUser() {
+//    User u = createUser();
+//    RegistrationConfirmationToken token = new RegistrationConfirmationToken();
+//
+//    when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
+////    when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+////    when(userRepository.save(any(User.class))).thenReturn(u);
+////    when(registrationTokenRepo.save(any(RegistrationConfirmationToken.class))).thenReturn(token);
+//
+////    User registeredUser = userDetailsServiceImplementation.registerUser(u);
+//
+//
+////    System.out.println(registeredUser.getUserName());
+////    assertEquals(registeredUser.getUserName(), "testUser");
+//
+//  }
 
   @Test(expected = EmailAlreadyExistException.class)
   public void register_shouldThrowEmailAlreadyExistException_WhenEmailAlreadyExist() {

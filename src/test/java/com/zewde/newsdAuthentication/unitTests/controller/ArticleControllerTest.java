@@ -1,20 +1,22 @@
-package com.zewde.newsdAuthentication.controller;
+package com.zewde.newsdAuthentication.unitTests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zewde.newsdAuthentication.Exceptions.ArticleNotFoundException;
-import com.zewde.newsdAuthentication.config.CustomAuthenticationFilter;
+import com.zewde.newsdAuthentication.controller.ArticleController;
 import com.zewde.newsdAuthentication.entities.Article;
-import com.zewde.newsdAuthentication.service.ArticleService;
-import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.unitTests.service.ArticleService;
+import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -27,7 +29,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
+@WebMvcTest
 @RunWith(MockitoJUnitRunner.class)
+@ActiveProfiles("test")
 public class ArticleControllerTest {
 
   @InjectMocks
@@ -38,10 +43,6 @@ public class ArticleControllerTest {
 
   @Mock
   UserDetailsServiceImplementation userService;
-
-  @Mock
-  private CustomAuthenticationFilter filter;
-
 
   @Mock
   private JWTTokenUtils jwtTokenUtils;
@@ -73,7 +74,7 @@ public class ArticleControllerTest {
         .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(0))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("first Article"));
-    ;
+
 
   }
 
@@ -123,6 +124,7 @@ public class ArticleControllerTest {
   @Test
   public void shouldReturnNewResponseStatusException_whenArticleNotFound() throws Exception {
     when(articleService.deleteUnbookmarkedArticle(any(Integer.class))).thenThrow(new ArticleNotFoundException(""));
+
     mockMvc.perform(MockMvcRequestBuilders.delete("/articles/article?id=1").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isNotFound())
           .andExpect(MockMvcResultMatchers.status().reason("No Article with id=1"));

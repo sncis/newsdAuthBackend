@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.utils.validators;
+package com.zewde.newsdAuthentication.unitTests.utils.validators;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

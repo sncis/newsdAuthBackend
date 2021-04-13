@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.utils;
+package com.zewde.newsdAuthentication.unitTests.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

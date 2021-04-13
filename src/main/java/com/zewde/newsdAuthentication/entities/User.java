@@ -1,7 +1,9 @@
 package com.zewde.newsdAuthentication.entities;
 
-import com.zewde.newsdAuthentication.utils.validators.ValidEmail;
-import com.zewde.newsdAuthentication.utils.validators.ValidPassword;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.zewde.newsdAuthentication.unitTests.utils.validators.ValidEmail;
+import com.zewde.newsdAuthentication.unitTests.utils.validators.ValidPassword;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +13,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -59,6 +60,9 @@ public class User implements UserDetails {
   @Column(name="active")
   private boolean active;
 
+  @JsonDeserialize(as = GrantedAuthority.class)
+  @JsonIgnore
+//  @JsonProperty("authorities")
   @Transient
   private List<GrantedAuthority> authorities = new ArrayList<>();
 
@@ -125,8 +129,11 @@ public class User implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    final SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role);
-    return Collections.singletonList(authority);
+    List<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(this.role));
+//    final SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role);
+//    return Collections.singletonList(authority);
+    return authorities;
   }
 
   public void setAuthorities(List<GrantedAuthority> authorities) {

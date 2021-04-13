@@ -2,9 +2,9 @@ package com.zewde.newsdAuthentication.config;
 
 
 import com.zewde.newsdAuthentication.entities.User;
-import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.utils.CookiesUtils;
-import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.unitTests.utils.CookiesUtils;
+import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+//@Order(2)
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired
@@ -35,21 +36,25 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
+    System.out.println("################ Initialising CustomAuthenticationFilter ##################");
     logger.info("Filtering request for path: " + request.getRequestURI());
+
     String username = null;
     String token = null;
       try{
         token = cookiesUtils.getTokenFromCookies("jwtToken",request.getCookies());
         username = JWTTokenUtils.getUsernameFromToken(token);
-
+        if(SecurityContextHolder.getContext().getAuthentication() == null && JWTTokenUtils.validateToken(username, token)){
+          User user = userDetailsService.loadUserByUsername(username);
+          setSecurityContext(user,request);
+        }
       }catch(Exception ex){
         logger.warn("Exception occurred " + ex.getClass() + " because of " + ex.getMessage());
+
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not authorized");
       }
 
-      if(SecurityContextHolder.getContext().getAuthentication() == null && JWTTokenUtils.validateToken(username, token)){
-        User user = userDetailsService.loadUserByUsername(username);
-        setSecurityContext(user,request);
-      }
+
 
     chain.doFilter(request,response);
   }
@@ -69,6 +74,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException {
     String path = request.getRequestURI();
     List<String> urls = Arrays.asList("/login", "/register", "confirmeUser", "/logout" );
+//    List<String> urls = Arrays.asList("/login", "confirmeUser", "/logout" );
+
     return urls.contains(path);
   }
 

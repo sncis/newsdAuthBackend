@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.service;
+package com.zewde.newsdAuthentication.unitTests.service;
 
 import com.zewde.newsdAuthentication.Exceptions.ArticleNotFoundException;
 import com.zewde.newsdAuthentication.Exceptions.DataBaseException;
@@ -8,13 +8,12 @@ import com.zewde.newsdAuthentication.repositories.ArticleRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 
@@ -25,18 +24,18 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 public class ArticleServiceTest {
 
-  @Autowired
+  @InjectMocks
   public ArticleService articleService;
 
-  @MockBean
+  @Mock
   private UserDetailsServiceImplementation userDetailsServiceImplementation;
 
-  @MockBean
+  @Mock
   private ArticleRepository articleRepository;
 
   private ArrayList<Article> articles = new ArrayList<>();

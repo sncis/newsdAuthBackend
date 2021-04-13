@@ -1,6 +1,7 @@
-package com.zewde.newsdAuthentication.repositories;
+package com.zewde.newsdAuthentication.unitTests.repositories;
 
 import com.zewde.newsdAuthentication.entities.Article;
+import com.zewde.newsdAuthentication.repositories.ArticleRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
