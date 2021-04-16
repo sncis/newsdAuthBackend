@@ -2,8 +2,8 @@ package com.zewde.newsdAuthentication.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.zewde.newsdAuthentication.unitTests.utils.validators.ValidEmail;
-import com.zewde.newsdAuthentication.unitTests.utils.validators.ValidPassword;
+import com.zewde.newsdAuthentication.utils.validators.ValidEmail;
+import com.zewde.newsdAuthentication.utils.validators.ValidPassword;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +38,7 @@ public class User implements UserDetails {
   @Column(name="username")
   private String username;
 
+  @NotNull
   @Column(name="password")
   @ValidPassword
   private String password;

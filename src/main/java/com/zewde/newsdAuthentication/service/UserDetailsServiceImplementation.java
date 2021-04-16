@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.unitTests.service;
+package com.zewde.newsdAuthentication.service;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;

@@ -1,7 +1,7 @@
 package com.zewde.newsdAuthentication.config;
 
 
-import com.zewde.newsdAuthentication.unitTests.utils.CookiesUtils;
+import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

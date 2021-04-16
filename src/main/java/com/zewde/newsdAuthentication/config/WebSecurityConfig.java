@@ -1,7 +1,7 @@
 package com.zewde.newsdAuthentication.config;
 
-import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,6 +54,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
   }
 
+//  @Override
+//  public void configure(WebSecurity web) throws Exception{
+//    web.ignoring().antMatchers("/auth*", "/");
+//  }
 
   @Override
   public void configure(HttpSecurity http) throws Exception{
@@ -61,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and()
         .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
-        .antMatchers("/login","/register","/confirmUser","/logout").permitAll().and().authorizeRequests().anyRequest().authenticated().and()
+        .antMatchers("/auth/*", "/").permitAll().and().authorizeRequests().anyRequest().authenticated().and()
         .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
         .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

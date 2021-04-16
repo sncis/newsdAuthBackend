@@ -2,9 +2,9 @@ package com.zewde.newsdAuthentication.controller;
 
 import com.zewde.newsdAuthentication.Exceptions.ArticleNotFoundException;
 import com.zewde.newsdAuthentication.entities.Article;
-import com.zewde.newsdAuthentication.unitTests.service.ArticleService;
-import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.service.ArticleService;
+import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -6,11 +6,11 @@ import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNot
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
-import com.zewde.newsdAuthentication.unitTests.service.ArticleService;
-import com.zewde.newsdAuthentication.unitTests.service.RegistrationConfirmationTokenService;
-import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.unitTests.utils.CookiesUtils;
-import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.service.ArticleService;
+import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
+import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.CookiesUtils;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +28,7 @@ import javax.validation.Valid;
 
 
 @RestController
-@RequestMapping(value="/",consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
+@RequestMapping(value="/auth",consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
 public class UserController {
 
 

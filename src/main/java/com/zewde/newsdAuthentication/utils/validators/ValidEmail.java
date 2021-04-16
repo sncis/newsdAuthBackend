@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.unitTests.utils.validators;
+package com.zewde.newsdAuthentication.utils.validators;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -11,10 +11,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ TYPE, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = MyPasswordValidator.class)
+@Constraint(validatedBy = MyEmailValidator.class)
 @Documented
-public @interface ValidPassword {
-  String message() default "Invalid Password";
+public @interface ValidEmail {
+
+  String message() default "Invalid Email";
 
   Class<?>[] groups() default {};
 

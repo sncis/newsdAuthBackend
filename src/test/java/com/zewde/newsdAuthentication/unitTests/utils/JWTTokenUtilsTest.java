@@ -1,6 +1,7 @@
 package com.zewde.newsdAuthentication.unitTests.utils;
 
 import com.zewde.newsdAuthentication.entities.User;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.Before;
 import org.junit.Test;

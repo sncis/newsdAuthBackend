@@ -5,7 +5,7 @@ import com.zewde.newsdAuthentication.entities.Article;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.ArticleRepository;
 import com.zewde.newsdAuthentication.repositories.UserRepository;
-import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

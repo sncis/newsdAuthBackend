@@ -2,9 +2,9 @@ package com.zewde.newsdAuthentication.config;
 
 
 import com.zewde.newsdAuthentication.entities.User;
-import com.zewde.newsdAuthentication.unitTests.service.UserDetailsServiceImplementation;
-import com.zewde.newsdAuthentication.unitTests.utils.CookiesUtils;
-import com.zewde.newsdAuthentication.unitTests.utils.JWTTokenUtils;
+import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
+import com.zewde.newsdAuthentication.utils.CookiesUtils;
+import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,8 +54,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not authorized");
       }
 
-
-
     chain.doFilter(request,response);
   }
 
@@ -73,9 +71,10 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
-    List<String> urls = Arrays.asList("/login", "/register", "confirmeUser", "/logout" );
-//    List<String> urls = Arrays.asList("/login", "confirmeUser", "/logout" );
-
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirmUser","/", "/error");
+    System.out.println("***********************");
+    System.out.println(urls.contains(path));
+    System.out.println("***********************");
     return urls.contains(path);
   }
 
