@@ -98,7 +98,7 @@ public class UserControllerTest {
 
   @Test
   public void getRegister() throws Exception{
-    mockMvc.perform(get("/register").contentType(MediaType.APPLICATION_JSON))
+    mockMvc.perform(get("/auth/register").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(content().string("please register"));
   }
@@ -111,7 +111,7 @@ public class UserControllerTest {
     RegistrationConfirmationToken token = new RegistrationConfirmationToken(user);
     when(userService.registerUserAndReturnToken(any(User.class))).thenReturn(token);
 
-    mockMvc.perform(post("/register")
+    mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
 //        .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
@@ -125,7 +125,7 @@ public class UserControllerTest {
     user.setEmail("");
     String userJSON = createUserJson(user);
 
-    mockMvc.perform(post("/register")
+    mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
@@ -138,7 +138,7 @@ public class UserControllerTest {
     User user = createUser();
     String userJSON = createUserJson(user);
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/register")
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Email already exists"))
@@ -153,7 +153,7 @@ public class UserControllerTest {
     User user = createUser();
     String userJSON = createUserJson(user);
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/register")
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
@@ -173,7 +173,7 @@ public class UserControllerTest {
     when(jwtTokenUtils.generateToken(any(String.class))).thenReturn("some token");
     when(cookiesUtils.createCookie(any(String.class), any(String.class))).thenReturn(cookie);
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/login")
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(json).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.cookie().exists("jwtToken"));

@@ -71,7 +71,7 @@ public class UserControllerIntegrationTest {
 
   @Test
   public void getRegister() throws Exception{
-    mockMvc.perform(get("/register").contentType(MediaType.APPLICATION_JSON))
+    mockMvc.perform(get("/auth/register").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(content().string("please register"));
   }
@@ -85,7 +85,7 @@ public class UserControllerIntegrationTest {
 
 //    when(userService.registerUser(any(User.class))).thenReturn();
 
-    mockMvc.perform(post("/register")
+    mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
 //        .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
@@ -101,7 +101,7 @@ public class UserControllerIntegrationTest {
     String userJson = createUserJson(user);
 
 
-      mockMvc.perform(post("/register")
+      mockMvc.perform(post("/auth/register")
           .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJson).with(csrf()))
           .andExpect(MockMvcResultMatchers.status().isBadRequest())
           .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
@@ -117,7 +117,7 @@ public class UserControllerIntegrationTest {
     String jsonU = createUserJson(createUser("someUser123","tererE345@!","email34@ermai.com"));
 
 
-      mockMvc.perform(post("/register")
+      mockMvc.perform(post("/auth/register")
           .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonU).with(csrf()))
           .andExpect(MockMvcResultMatchers.status().isBadRequest())
           .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
@@ -132,7 +132,7 @@ public class UserControllerIntegrationTest {
     String jsonU = createUserJson(createUser("someusername", "somePassword1234!","some234@email.com"));
 
 
-    mockMvc.perform(post("/register")
+    mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonU).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Email already exists"))
@@ -151,7 +151,7 @@ public class UserControllerIntegrationTest {
 
     String jsonUser = createUserJson(u);
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/login")
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -169,7 +169,7 @@ public class UserControllerIntegrationTest {
 
     String jsonUser = createUserJson(createUser("testuser","tesR12","testUser@email.com"));
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/login")
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Wrong username or password"));
