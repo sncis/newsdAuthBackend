@@ -71,7 +71,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirmUser","/", "/error");
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirmUser","/", "/error", "/favicon.ico");
     System.out.println("***********************");
     System.out.println(urls.contains(path));
     System.out.println("***********************");

@@ -8,7 +8,7 @@ target/
 mvnw
 mvnw.cmd
 
-application.properties
+#application.properties
 
 ### STS ###
 .apt_generated
