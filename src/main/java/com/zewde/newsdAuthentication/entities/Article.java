@@ -12,8 +12,8 @@ public class Article implements Serializable {
 
   @Id
 //  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name="article_id", unique=true)
-  private int id;
+  @Column(name="_id", unique=true)
+  private String _id;
 
 
   @Column(name="user_id")
@@ -28,7 +28,7 @@ public class Article implements Serializable {
   @Column(name="title")
   private String title;
 
-  @Column(name="summary")
+  @Column(name="summary", columnDefinition="TEXT")
   private String summary;
 
   @Column(name="url")
@@ -39,7 +39,6 @@ public class Article implements Serializable {
 
   @Column(name="published_date")
   private String published_date;
-
 
   @Column(name="topic")
   private String topic;
@@ -63,8 +62,8 @@ public class Article implements Serializable {
   public Article(){
   }
 
-  public Article(int id, int userId, String clean_url, String author, String title, String summary, String link, String published_date, String topic, String country, String language, String rank, String rights, boolean isBookmarked){
-    this.id = id;
+  public Article(String _id, int userId, String clean_url, String author, String title, String summary, String link, String published_date, String topic, String country, String language, String rank, String rights, boolean isBookmarked){
+    this._id = _id;
     this.userId = userId;
     this.clean_url = clean_url;
     this.author = author;
@@ -80,12 +79,12 @@ public class Article implements Serializable {
     this.isBookmarked= isBookmarked;
   }
 
-  public int getId() {
-    return id;
+  public String get_id() {
+    return _id;
   }
 
-  public void setId(int id) {
-    this.id = id;
+  public void set_id(String id) {
+    this._id = id;
   }
 
   public int getUserId() {
@@ -192,123 +191,10 @@ public class Article implements Serializable {
   public void setBookmarked(boolean bookmarked) {
     isBookmarked = bookmarked;
   }
-  //  public Article(int id, String title, String description){
-//    this.title = title;
-//    this.description = description;
-//    this.id =id;
-//  }
-//
-//  public Article (Long id, int userId, String clean_url, String author, String title, String summary, String link, String urlToImage, String published_date, String topic, boolean isBookmarked){
-//    this.id = id;
-//    this.userId = userId;
-//    this.clean_url = clean_url;
-//    this.author = author;
-//    this.title = title;
-//    this.summary = summary;
-//    this.link = link;
-//    this.urlToImage = urlToImage;
-//    this.published_date = published_date;
-//    this.topic = topic;
-//    this.isBookmarked = isBookmarked;
-//  }
-//
-//
-//  public void setId(Long id) {
-//    this.id = id;
-//  }
-//
-//  public Long getId() {
-//    return id;
-//  }
-//
-//  public boolean isBookmarked() {
-//    return isBookmarked;
-//  }
-//
-//  public int getUserId() {
-//    return userId;
-//  }
-//
-//  public void setUserId(int userId) {
-//    this.userId = userId;
-//  }
-//
-//  public String getClean_url() {
-//    return clean_url;
-//  }
-//
-//  public void setClean_url(String clean_url) {
-//    this.clean_url = clean_url;
-//  }
-//
-//  public String getAuthor() {
-//    return author;
-//  }
-//
-//  public void setAuthor(String author) {
-//    this.author = author;
-//  }
-//
-//  public String getLink() {
-//    return link;
-//  }
-//
-//  public void setLink(String link) {
-//    this.link = link;
-//  }
-//
-//  public String getUrlToImage() {
-//    return urlToImage;
-//  }
-//
-//  public void setUrlToImage(String urlToImage) {
-//    this.urlToImage = urlToImage;
-//  }
-//
-//  public String getPublished_date() {
-//    return published_date;
-//  }
-//
-//  public void setPublished_date(String published_date) {
-//    this.published_date = published_date;
-//  }
-//
-//  public String getContent() {
-//    return topic;
-//  }
-//
-//  public void setContent(String content) {
-//    this.topic = content;
-//  }
-//
-//  public boolean getIsBookmarked() {
-//    return isBookmarked;
-//  }
-//
-//  public void setBookmarked(boolean isBookmarked) {
-//    this.isBookmarked = isBookmarked;
-//  }
-//
-//
-//  public String getTitle() {
-//    return title;
-//  }
-//
-//  public void setTitle(String title) {
-//    this.title = title;
-//  }
-//
-//  public String getSummary() {
-//    return summary;
-//  }
-//
-//  public void setSummary(String description) {
-//    this.summary = description;
-//  }
 
   @Override
   public String toString(){
-    return String.format("Article [articleId= %d, author= %s, description= %s, title=%s, published= %s]", id,author, summary, title, published_date);
+    return String.format("Article [articleId= %s, author= %s, description= %s, title=%s, published= %s]", _id,author, summary, title, published_date);
 
   }
 }

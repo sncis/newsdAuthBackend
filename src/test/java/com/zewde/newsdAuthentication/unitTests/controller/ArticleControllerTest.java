@@ -57,8 +57,8 @@ public class ArticleControllerTest {
   }
   @Test
   public void getArticlesPerUser() throws Exception {
-    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
-    Article article2 = new Article(2, 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
+    Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    Article article2 = new Article("2", 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
 
     ArrayList<Article> articles = new ArrayList<>();
     articles.add(article1);
@@ -72,15 +72,15 @@ public class ArticleControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.get("/articles?username=someUser").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(0))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("first Article"));
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value("1"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("some title"));
 
 
   }
 
   @Test
   public void saveBookmarkedArticles() throws Exception {
-    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
     String json = new ObjectMapper().writeValueAsString(article1);
 
     when(userService.findUserIdByUsername(any(String.class))).thenReturn(1);
@@ -93,7 +93,7 @@ public class ArticleControllerTest {
 
   @Test
   public void shouldThrowException_whenUsernameNotFound() throws Exception {
-    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
 
     String json = new ObjectMapper().writeValueAsString(article1);
 
@@ -115,7 +115,7 @@ public class ArticleControllerTest {
 
   @Test
   public void deleteUnbookmarkedArticle() throws Exception {
-    when(articleService.deleteUnbookmarkedArticle(any(Integer.class))).thenReturn(true);
+    when(articleService.deleteUnbookmarkedArticle(any(String.class))).thenReturn(true);
 
     mockMvc.perform(MockMvcRequestBuilders.delete("/articles/article?id=1").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk());
@@ -124,7 +124,7 @@ public class ArticleControllerTest {
 
   @Test
   public void shouldReturnNewResponseStatusException_whenArticleNotFound() throws Exception {
-    when(articleService.deleteUnbookmarkedArticle(any(Integer.class))).thenThrow(new ArticleNotFoundException(""));
+    when(articleService.deleteUnbookmarkedArticle(any(String.class))).thenThrow(new ArticleNotFoundException(""));
 
     mockMvc.perform(MockMvcRequestBuilders.delete("/articles/article?id=1").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isNotFound())

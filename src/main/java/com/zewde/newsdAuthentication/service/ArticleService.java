@@ -46,11 +46,12 @@ public class ArticleService {
 
   }
 
-  public boolean deleteUnbookmarkedArticle(int articleId) throws ArticleNotFoundException{
+
+  public boolean deleteUnbookmarkedArticle(String articleId) throws ArticleNotFoundException{
 
     try {
 //      articleRepository.deleteArticleByTitle(title);
-      articleRepository.deleteById(articleId);
+      articleRepository.deleteBy_id(articleId);
       return true;
     } catch(EmptyResultDataAccessException e) {
       throw new ArticleNotFoundException("No such article");
@@ -62,7 +63,15 @@ public class ArticleService {
     try{
       return articleRepository.saveAndFlush(article);
     }catch(Exception e){
-      throw new DataBaseException("something went wrong");
+      System.out.println("**************************************");
+      System.out.println("**************************************");
+      System.out.println("**************************************");
+      System.out.println("**************************************");
+      System.out.println("**************************************");
+      System.out.println(e.getCause());
+      System.out.println(e.getMessage());
+
+      throw new DataBaseException(e.getMessage());
     }
 
   }

@@ -59,8 +59,8 @@ public class ArticleControllerIntegrationTest {
 
   private void setUpArticlesForUser(){
     int userId = getUserIdforUser();
-    articleRepository.save(new Article(1, userId,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true));
-    articleRepository.save(new Article(2, userId,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true));
+    articleRepository.save(new Article("1", userId,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true));
+    articleRepository.save(new Article("2", userId,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true));
   }
 
 

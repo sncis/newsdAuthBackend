@@ -77,7 +77,7 @@ public class ArticleController {
 
 
   @DeleteMapping("/articles/article")
-  public ResponseEntity<?> deleteUnbookmarkedArticle(@RequestParam("id") int id){
+  public ResponseEntity<?> deleteUnbookmarkedArticle(@RequestParam("id") String id){
     ArrayList<Article> articles;
     try{
       articleService.deleteUnbookmarkedArticle(id);

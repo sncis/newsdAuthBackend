@@ -33,8 +33,8 @@ public class ArticleRepositoryTest {
 
   @Before
   public void setUp(){
-    article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
-    article2 = new Article(2, 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
+    article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    article2 = new Article("2", 1,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
 
     repository.save(article1);
     repository.save(article2);
@@ -44,7 +44,7 @@ public class ArticleRepositoryTest {
   @Test
   public void findAllByUserId() {
     ArrayList<Article> articles = repository.findAllByUserId(1);
-
+    System.out.println(articles);
     assertNotNull(article1);
     assertEquals(articles.size(),2);
     assertEquals(article1.getClean_url(), articles.get(0).getClean_url());
@@ -52,7 +52,7 @@ public class ArticleRepositoryTest {
   }
   @Test
   public void shouldReturnEmptyArray_whenNoArticlesByUserId() {
-    ArrayList<Article> articles = repository.findAllByUserId(2);
+    ArrayList<Article> articles = repository.findAllByUserId(4);
 
     assertEquals(articles.size(),0);
 
@@ -65,8 +65,8 @@ public class ArticleRepositoryTest {
 
     assertEquals(repository.count(),2);
 
-    int articleToDeleteId = articles.get(0).getId();
-    repository.deleteById(articleToDeleteId);
+    String articleToDeleteId = articles.get(0).get_id();
+    repository.deleteBy_id(articleToDeleteId);
 
     assertEquals(repository.count(),1);
   }
@@ -76,7 +76,7 @@ public class ArticleRepositoryTest {
     ArrayList<Article> articles= repository.findAllByUserId(2);
 
     try{
-      repository.deleteById(0);
+      repository.deleteBy_id("0");
     }catch(EmptyResultDataAccessException e) {
       System.out.println("No article with such ID");
     }

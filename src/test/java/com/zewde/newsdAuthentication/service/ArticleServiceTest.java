@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 
@@ -43,8 +42,8 @@ public class ArticleServiceTest {
 
   @Before
   public void setUp(){
-    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
-    Article article2 = new Article(2, 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
+    Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    Article article2 = new Article("2", 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
 
     articles.add(article1);
     articles.add(article2);
@@ -75,15 +74,15 @@ public class ArticleServiceTest {
 
   @Test
   public void deleteUnbookmarkedArticles() {
-    doNothing().when(articleRepository).deleteById(anyInt());
-    boolean isDeleted = articleService.deleteUnbookmarkedArticle(1);
+    doNothing().when(articleRepository).deleteBy_id(anyString());
+    boolean isDeleted = articleService.deleteUnbookmarkedArticle("1");
     assertTrue(isDeleted);
   }
 
   @Test(expected = ArticleNotFoundException.class)
-  public void shouldTrowArticleNotFoundException_WhendeleteUnbookmarkedArticles() {
-    doThrow(new EmptyResultDataAccessException(1)).when(articleRepository).deleteById(anyInt());
-    articleService.deleteUnbookmarkedArticle(1000);
+  public void shouldThrowArticleNotFoundException_WhenDeleteUnbookmarkedArticles() {
+    doThrow(new EmptyResultDataAccessException(1)).when(articleRepository).deleteBy_id(anyString());
+    articleService.deleteUnbookmarkedArticle("1000");
 
   }
 
