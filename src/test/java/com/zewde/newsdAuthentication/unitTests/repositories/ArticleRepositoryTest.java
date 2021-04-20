@@ -33,8 +33,8 @@ public class ArticleRepositoryTest {
 
   @Before
   public void setUp(){
-    article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content", true);
-    article2 = new Article(1,"some second source","some  second author","some second title", "some second description","some second url", "some second url to image", "2020-04-09", "some second more content", true);
+    article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    article2 = new Article(2, 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
 
     repository.save(article1);
     repository.save(article2);
@@ -47,7 +47,7 @@ public class ArticleRepositoryTest {
 
     assertNotNull(article1);
     assertEquals(articles.size(),2);
-    assertEquals(article1.getSource(), articles.get(0).getSource());
+    assertEquals(article1.getClean_url(), articles.get(0).getClean_url());
 
   }
   @Test

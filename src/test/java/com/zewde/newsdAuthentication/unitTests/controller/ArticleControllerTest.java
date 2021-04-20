@@ -57,8 +57,8 @@ public class ArticleControllerTest {
   }
   @Test
   public void getArticlesPerUser() throws Exception {
-    Article article1 = new Article(1,"first source","first author","first Article", "first description","first url", "first url to image", "2020-04-09", "first  content", true);
-    Article article2 = new Article(2,"some second source","some  second author","some second title", "some second description","some second url", "some second url to image", "2020-04-09", "some second more content", true);
+    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+    Article article2 = new Article(2, 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
 
     ArrayList<Article> articles = new ArrayList<>();
     articles.add(article1);
@@ -80,7 +80,7 @@ public class ArticleControllerTest {
 
   @Test
   public void saveBookmarkedArticles() throws Exception {
-    Article article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content", true);
+    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
     String json = new ObjectMapper().writeValueAsString(article1);
 
     when(userService.findUserIdByUsername(any(String.class))).thenReturn(1);
@@ -93,7 +93,8 @@ public class ArticleControllerTest {
 
   @Test
   public void shouldThrowException_whenUsernameNotFound() throws Exception {
-    Article article1 = new Article(1,"some source","some  author","some title", "some description","some url", "some url to image", "2020-04-09", "some second more content", true);
+    Article article1 = new Article(1, 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
+
     String json = new ObjectMapper().writeValueAsString(article1);
 
     when(userService.findUserIdByUsername(any(String.class))).thenThrow(new UsernameNotFoundException(""));
