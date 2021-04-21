@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/articles")
 public class ArticleController {
 
   @Autowired
@@ -29,7 +29,7 @@ public class ArticleController {
   @Autowired
   JWTTokenUtils jwtTokenUtils;
 
-  @GetMapping("/articles")
+  @GetMapping("")
   public ResponseEntity<?> getArticlesPerUser(@RequestParam("username") String user, HttpServletRequest req){
     ArrayList<Article> articles;
     Cookie[] cookies =  req.getCookies();
@@ -55,7 +55,7 @@ public class ArticleController {
 
   }
 
-  @PostMapping("/articles")
+  @PostMapping("")
   public ResponseEntity<?> saveBookmarkedArticles(@RequestParam("username") String username, @RequestBody Article article){
     Article savedArticle;
 //    ArrayList<Article> allArticles;
@@ -76,7 +76,7 @@ public class ArticleController {
 
 
 
-  @DeleteMapping("/articles/article")
+  @DeleteMapping("/article")
   public ResponseEntity<?> deleteUnbookmarkedArticle(@RequestParam("id") String id){
     ArrayList<Article> articles;
     try{
@@ -85,6 +85,11 @@ public class ArticleController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,String.format("No Article with id=%s",id),e);
     }
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @GetMapping("/admin")
+  public ResponseEntity<?> getAdminSide(){
+    return new ResponseEntity<>("hello Mrs. Admin", HttpStatus.OK);
   }
 
 }

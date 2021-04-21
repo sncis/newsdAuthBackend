@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -48,11 +49,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return super.authenticationManagerBean();
   }
 
+  @Bean
+  GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    return new GrantedAuthorityDefaults("");
+  }
+
 
   @Override
   public void configure(AuthenticationManagerBuilder auth) throws Exception{
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
   }
+
 
 //  @Override
 //  public void configure(WebSecurity web) throws Exception{
@@ -65,8 +72,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and()
         .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
-        .antMatchers("/auth/*", "/").permitAll().and().authorizeRequests().anyRequest().authenticated().and()
-        .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
+            .antMatchers("/articles/admin").hasAuthority("ADMIN")
+            .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
+            .antMatchers("/auth/*", "/").permitAll()
+            .and().authorizeRequests().anyRequest().authenticated().and()
+            .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
         .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
@@ -98,5 +108,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     return source;
   }
+
+
 
 }

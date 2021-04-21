@@ -23,7 +23,6 @@ public class CustomeJWTEntryPoint implements AuthenticationEntryPoint {
       throws IOException {
       Cookie cookie = cookiesUtils.createCookie("jwtToken", "", 0);
       res.addCookie(cookie);
-      res.sendError(HttpServletResponse.SC_UNAUTHORIZED,authException.getMessage());
-//      res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized User and so one");
+      res.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorised user please login or register");
   }
 }

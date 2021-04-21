@@ -121,4 +121,5 @@ public class UserController {
     return new ResponseEntity<>("registration confirmation successful",HttpStatus.OK);
 
   }
+
 }

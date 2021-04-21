@@ -8,12 +8,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -24,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 //@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE) -> use for integration test when you want totest again your actuell database
 //@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.AUTO_CONFIGURED)
 public class ArticleRepositoryTest {
+
+
+  BCryptPasswordEncoder passwordEncoder  = new BCryptPasswordEncoder();
 
   @Autowired
   private ArticleRepository repository;
@@ -82,5 +87,15 @@ public class ArticleRepositoryTest {
     }
 
     assertEquals(articles.size(), 0);
+  }
+
+  @Test
+  public void passwordTest(){
+    String pass = "adminPassword1234!";
+    String epass = passwordEncoder.encode(pass);
+    System.out.println("******");
+    System.out.println(epass);
+
+    assertTrue(passwordEncoder.matches(pass,epass));
   }
 }

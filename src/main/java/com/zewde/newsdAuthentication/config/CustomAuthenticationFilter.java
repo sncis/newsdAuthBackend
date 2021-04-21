@@ -5,8 +5,10 @@ import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -34,6 +36,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   @Autowired
   CookiesUtils cookiesUtils;
 
+  @Autowired
+  CustomeJWTEntryPoint authEntrypoint;
+
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
     System.out.println("################ Initialising CustomAuthenticationFilter ##################");
@@ -48,13 +53,14 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
           User user = userDetailsService.loadUserByUsername(username);
           setSecurityContext(user,request);
         }
-      }catch(Exception ex){
+      }catch(AuthenticationException | ExpiredJwtException authex ){
+        authEntrypoint.commence(request,response, (AuthenticationException) authex);
+      } catch(Exception ex){
         logger.warn("Exception occurred " + ex.getClass() + " because of " + ex.getMessage());
 //checking why 500 is returned when token is not valid
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not authorized");
-      }
-
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not authorized");
     chain.doFilter(request,response);
+    }
   }
 
 
