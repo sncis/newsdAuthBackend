@@ -59,8 +59,11 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         logger.warn("Exception occurred " + ex.getClass() + " because of " + ex.getMessage());
 //checking why 500 is returned when token is not valid
         response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not authorized");
-    chain.doFilter(request,response);
     }
+
+      logger.info("Filtering request for path: " + request.getRequestURI());
+      chain.doFilter(request,response);
+
   }
 
 

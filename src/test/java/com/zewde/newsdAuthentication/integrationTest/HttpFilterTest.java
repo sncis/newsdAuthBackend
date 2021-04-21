@@ -32,18 +32,3 @@ public class HttpFilterTest {
 }
 
 
-
-
-//@WebMvcTest // this anotioan only configutre the mvc layer and does not boost the whole configuration so beans etc are not injectet
-//@ActiveProfiles("test")
-//public class HttpFilterTest {
-//
-//  @Autowired
-//  private MockMvc mockMvc;
-//
-//  @Test
-//  public void shouldReturnDefaultMessage() throws Exception {
-//    this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-//        .andExpect(content().string(containsString("Hello, World")));
-//  }
-//}

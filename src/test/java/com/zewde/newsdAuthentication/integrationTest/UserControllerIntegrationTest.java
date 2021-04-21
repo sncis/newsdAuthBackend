@@ -49,7 +49,7 @@ public class UserControllerIntegrationTest {
 
   private User createUser(){
     User u = new User();
-    u.setUsername("someUser");
+    u.setUsername("someUser6543");
     u.setPassword("Pass123!");
     u.setEmail("some@email.com");
     return u;
@@ -93,7 +93,7 @@ public class UserControllerIntegrationTest {
 
   @Test
   public void registerShouldFail_WhenInvalidCredentials() throws Exception {
-    User user = createUser("someUserName","somepas","some@email.com");
+    User user = createUser("stesds","somepas","some@email.com");
 //    user.setUsername("someUserName");
 //    user.setPassword("somepas");
 //    user.setEmail("some@email.com");

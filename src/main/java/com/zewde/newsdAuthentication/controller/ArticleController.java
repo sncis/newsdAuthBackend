@@ -7,17 +7,17 @@ import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/articles")
+@RequestMapping(value="/", consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
 public class ArticleController {
 
   @Autowired
@@ -29,33 +29,24 @@ public class ArticleController {
   @Autowired
   JWTTokenUtils jwtTokenUtils;
 
-  @GetMapping("")
+  @GetMapping("/articles")
   public ResponseEntity<?> getArticlesPerUser(@RequestParam("username") String user, HttpServletRequest req){
     ArrayList<Article> articles;
-    Cookie[] cookies =  req.getCookies();
-    if(cookies != null){
-      for(Cookie c : cookies){
-        System.out.println("cookies from request");
-        System.out.println(c.getName());
-        }
-    }
 
     try{
       articles= articleService.getArticlesByUsername(user);
-
     }catch(UsernameNotFoundException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no such username",e);
     }catch(Exception e ){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong",e);
-
     }
     System.out.println("artcile in controler");
     System.out.println(articles);
-    return new ResponseEntity<>(articles, HttpStatus.OK);
 
+    return new ResponseEntity<>(articles, HttpStatus.OK);
   }
 
-  @PostMapping("")
+  @PostMapping("/articles")
   public ResponseEntity<?> saveBookmarkedArticles(@RequestParam("username") String username, @RequestBody Article article){
     Article savedArticle;
 //    ArrayList<Article> allArticles;
@@ -76,7 +67,7 @@ public class ArticleController {
 
 
 
-  @DeleteMapping("/article")
+  @DeleteMapping("/articles/article")
   public ResponseEntity<?> deleteUnbookmarkedArticle(@RequestParam("id") String id){
     ArrayList<Article> articles;
     try{

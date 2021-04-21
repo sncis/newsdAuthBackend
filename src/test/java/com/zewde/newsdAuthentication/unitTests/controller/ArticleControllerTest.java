@@ -108,7 +108,7 @@ public class ArticleControllerTest {
   public void shouldReturnNewResponseStatusException_whenWrongUsername() throws Exception {
     when(articleService.getArticlesByUsername(any(String.class))).thenThrow(new UsernameNotFoundException(""));
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/articles?username=someUser").contentType(MediaType.APPLICATION_JSON))
+    mockMvc.perform(MockMvcRequestBuilders.get("/articles?username=soser").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("no such username"));
   }
