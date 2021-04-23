@@ -4,7 +4,7 @@ package com.zewde.newsdAuthentication.controller;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.entities.EmailService;
+import com.zewde.newsdAuthentication.service.EmailService;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
@@ -29,6 +29,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Objects;
 
 
 @RestController
@@ -71,10 +72,12 @@ public class UserController {
   public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException, IOException, MessagingException {
 //    User u;
     RegistrationConfirmationToken token;
+    String textMail;
 
     try{
       token = userService.registerUserAndReturnToken(user);
-      String textMail = String.format(mailMessage.getText(), token.toString());
+      textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token);
+      System.out.println(textMail);
 
     }catch(EmailAlreadyExistException e){
       System.out.println(e);
@@ -86,9 +89,9 @@ public class UserController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Sorry something went wrong from Backend");
     }
    ;
-    String textMail = String.format(mailMessage.getText(), token.toString());
+//    String textMail = String.format(mailMessage.getText(), token.toString());
 
-    emailService.sendEmail(user.getEmail(),"confirmation newsdMe Token", textMail);
+    emailService.sendEmail(user.getEmail(),"Confirm newsdMe registration", textMail);
     return new ResponseEntity<>("",HttpStatus.CREATED);
   }
 

@@ -1,4 +1,4 @@
-package com.zewde.newsdAuthentication.entities;
+package com.zewde.newsdAuthentication.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +7,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class EmailService {
@@ -34,28 +36,11 @@ public class EmailService {
     logger.info("Mail created");
    try {
      mailSender.send(message);
-     logger.info("Email send to: {}",to);
-     logger.info("try to get text");
-     System.out.println(message.getText());
-
+     logger.info("Email send at : {}", new Date());
+     logger.info("Email send to: {}", to);
    }catch(MailException ex){
      logger.warn("Not able to send Email");
    }
 
   }
-
-
-//  public void sendHtmlMessage(String to, String subject, String htmlBody) throws MessagingException {
-//    MimeMessage message = mailSender.createMimeMessage();
-//
-//    MimeMessageHelper helper = new MimeMessageHelper(message,true,"UTF-8");
-//
-//    helper.setFrom(SENDER);
-//    helper.setTo(to);
-//    helper.setSubject(subject);
-//    helper.setText(htmlBody, true);
-//
-//    mailSender.send(message);
-//
-//  }
 }
