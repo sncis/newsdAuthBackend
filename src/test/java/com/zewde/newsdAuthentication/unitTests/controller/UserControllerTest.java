@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.controller.UserController;
+import com.zewde.newsdAuthentication.entities.EmailService;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
@@ -18,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -68,8 +71,17 @@ public class UserControllerTest {
   @Mock
   private CookiesUtils cookiesUtils;
 
+  @Mock
+  private EmailService emailService;
+
+  @Mock
+  private SimpleMailMessage mail;
+
+  @Mock
+  private JavaMailSender mailSender;
 
   private MockMvc mockMvc;
+
 
   private String createUserJson(User u) throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
@@ -93,8 +105,17 @@ public class UserControllerTest {
   public void setUp() throws Exception {
     mockMvc = MockMvcBuilders.standaloneSetup(userController)
         .build();
+
+//    mail = new SimpleMailMessage();
+//    when(mailSender.send(any(SimpleMailMessage.class))).thenAnwser();
+
   }
 
+
+//  mimeMessage = new MimeMessage((Session)null);
+//  javaMailSender = mock(JavaMailSender .class);
+//  when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+//  emailServiceImpl = new EmailService(javaMailSender);
 
   @Test
   public void getRegister() throws Exception{
@@ -110,9 +131,10 @@ public class UserControllerTest {
     String userJSON = createUserJson(user);
     RegistrationConfirmationToken token = new RegistrationConfirmationToken(user);
     when(userService.registerUserAndReturnToken(any(User.class))).thenReturn(token);
+    when(mail.getText()).thenReturn("some tex");
 
     mockMvc.perform(post("/auth/register")
-        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
 //        .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
   }

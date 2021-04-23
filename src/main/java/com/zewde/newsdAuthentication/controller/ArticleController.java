@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping(value="/", consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
+@RequestMapping(value="/",
+    consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE},
+    produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleController {
 
   @Autowired

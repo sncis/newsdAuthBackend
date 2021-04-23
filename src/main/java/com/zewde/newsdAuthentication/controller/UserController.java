@@ -4,6 +4,7 @@ package com.zewde.newsdAuthentication.controller;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
+import com.zewde.newsdAuthentication.entities.EmailService;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -22,9 +24,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 
 
 @RestController
@@ -51,28 +55,41 @@ public class UserController {
   private RegistrationConfirmationTokenService registrationConfirmationTokenService;
 
 
+  @Autowired
+  public SimpleMailMessage mailMessage;
+
+
+  @Autowired
+  private EmailService emailService;
+
   @GetMapping("/register")
   public @ResponseBody String getRegister(){
     return "please register";
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException {
+  public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException, IOException, MessagingException {
 //    User u;
     RegistrationConfirmationToken token;
 
     try{
-//      u = userService.registerUser(user);
       token = userService.registerUserAndReturnToken(user);
-//      userService.registerUser(user);
+      String textMail = String.format(mailMessage.getText(), token.toString());
+
     }catch(EmailAlreadyExistException e){
       System.out.println(e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists", e);
     } catch(UserNameAlreadyExistException e){
       System.out.println(e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists", e);
+    }catch(Exception e){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Sorry something went wrong from Backend");
     }
-    return new ResponseEntity<>(token,HttpStatus.CREATED);
+   ;
+    String textMail = String.format(mailMessage.getText(), token.toString());
+
+    emailService.sendEmail(user.getEmail(),"confirmation newsdMe Token", textMail);
+    return new ResponseEntity<>("",HttpStatus.CREATED);
   }
 
   @PostMapping("/login")
@@ -118,6 +135,7 @@ public class UserController {
 
       return new ResponseEntity<>(ex,HttpStatus.BAD_REQUEST);
     }
+
     return new ResponseEntity<>("registration confirmation successful",HttpStatus.OK);
 
   }

@@ -42,27 +42,31 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
     System.out.println("################ Initialising CustomAuthenticationFilter ##################");
-    logger.info("Filtering request for path: " + request.getRequestURI());
+    logger.info("Filtering request for uri:" + request.getRequestURI());
+    logger.info("Filtering request for uri:" + request.getPathInfo());
+
 
     String username = null;
     String token = null;
+
       try{
         token = cookiesUtils.getTokenFromCookies("jwtToken",request.getCookies());
         username = JWTTokenUtils.getUsernameFromToken(token);
+
         if(SecurityContextHolder.getContext().getAuthentication() == null && JWTTokenUtils.validateToken(username, token)){
           User user = userDetailsService.loadUserByUsername(username);
           setSecurityContext(user,request);
         }
       }catch(AuthenticationException | ExpiredJwtException authex ){
+        assert authex instanceof AuthenticationException;
         authEntrypoint.commence(request,response, (AuthenticationException) authex);
       } catch(Exception ex){
         logger.warn("Exception occurred " + ex.getClass() + " because of " + ex.getMessage());
-//checking why 500 is returned when token is not valid
-        response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not authorized");
-    }
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden request");
+      }
 
-      logger.info("Filtering request for path: " + request.getRequestURI());
-      chain.doFilter(request,response);
+    logger.info("Filtering request for path: " + request.getRequestURI());
+    chain.doFilter(request,response);
 
   }
 
@@ -80,11 +84,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirmUser","/", "/error", "/favicon.ico");
-    System.out.println("***********************");
-    System.out.println(urls.contains(path));
-    System.out.println("***********************");
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirmUser","/", "/error", "/favicon.ico*");
+
     return urls.contains(path);
   }
-
 }

@@ -20,7 +20,10 @@ public class LoggingFilter extends OncePerRequestFilter {
   public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException{
     System.out.println("################ Initialising LoggingFilter ##################");
     logger.info("Logging Request {} : {}", request.getMethod(), request.getRequestURI());
-    logger.info("Headers : {}", request.getPathInfo());
+    logger.info("for Content path : {}", request.getContextPath());
+    logger.info("with headers: {}", request.getHeaderNames());
+    logger.info(" Request Length {} :  with contnet type {}", request.getContentLength(), request.getContentType());
+
   chain.doFilter(request, response);
   }
 

@@ -81,34 +81,54 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .exceptionHandling().authenticationEntryPoint(customeJWTEntryPoint)
-           .and().httpBasic()
-        ;
-    ;
-    // ntry point is for defining waht to send back when error occures
+           .and().httpBasic();
+    http
+        .headers()
+        .contentTypeOptions()
+        .and().xssProtection()
+        .and().cacheControl()
+        .and().httpStrictTransportSecurity()
+        .and().frameOptions()
+        .and().contentSecurityPolicy("default-src 'self'"); //only permit resoruces from teh same origine
+    //only alow secured equests
+    http.requiresChannel()
+        .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
+        .requiresSecure();
 
   }
+
+    // ntry point is for defining waht to send back when error occures
+
+
   @Bean
   public CorsConfigurationSource corsConfigurationSource(){
     final CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOrigins(Arrays.asList("http://localhost:3000" ,"https://newsdme.herokuapp.com"));
+    config.setAllowedOrigins(Arrays.asList("https://localhost:3000" ,"https://newsdme.herokuapp.com"));
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
         "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-    config.setAllowedHeaders(Arrays.asList("Authorization","Accept",
-        "Cache-Control", "Content-Type",
+    config.setAllowedHeaders(Arrays.asList(
+        "Authorization",
+        "Accept",
+        "Cache-Control",
+        "Content-Type",
         "Access-Control-Allow-Origin",
         "Access-Control-Allow-Headers",
         "Access-Control-Allow-Credentials",
         "Access-Control-Allow-Methods",
         "x-frame-options",
-        "x-xsrf-token"));
+        "x-xsrf-token",
+        "Strict-Transport-Security",
+        "Content-Security-Policy",
+        "X-Content-Type-Options",
+        "X-XSS-Protection",
+        "X-Forwarded-Proto"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
 
     return source;
   }
-
 
 
 }
