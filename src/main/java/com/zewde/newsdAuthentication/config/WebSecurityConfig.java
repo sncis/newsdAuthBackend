@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
             .antMatchers("/articles/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
-            .antMatchers("/auth/*", "/").permitAll()
+            .antMatchers("/auth/*", "/", "/favicon.ico").permitAll()
             .and().authorizeRequests().anyRequest().authenticated().and()
             .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
         .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
@@ -89,7 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and().cacheControl()
         .and().httpStrictTransportSecurity()
         .and().frameOptions()
-        .and().contentSecurityPolicy("default-src 'self'"); //only permit resoruces from teh same origine
+        .and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com/"); //only permit resoruces from teh same origine
     //only alow secured equests
     http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
