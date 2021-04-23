@@ -21,10 +21,13 @@ public class NewsdAuthenticationApplicationTests {
 	@Autowired
 	private ArticleController articleController;
 
+
 	@Test
 	void contextLoads() {
 		assertThat(userController).isNotNull();
 		assertThat(articleController).isNotNull();
 	}
+
+
 
 }

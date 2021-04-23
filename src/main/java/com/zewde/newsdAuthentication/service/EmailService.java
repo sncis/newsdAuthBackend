@@ -39,7 +39,9 @@ public class EmailService {
      logger.info("Email send at : {}", new Date());
      logger.info("Email send to: {}", to);
    }catch(MailException ex){
+
      logger.warn("Not able to send Email");
+     logger.warn("Due to Exceptioncause: {}", ex.getCause());
    }
 
   }

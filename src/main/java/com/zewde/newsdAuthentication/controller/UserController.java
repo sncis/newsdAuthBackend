@@ -4,14 +4,16 @@ package com.zewde.newsdAuthentication.controller;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
-import com.zewde.newsdAuthentication.service.EmailService;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.ArticleService;
+import com.zewde.newsdAuthentication.service.EmailService;
 import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +38,7 @@ import java.util.Objects;
 @RequestMapping(value="/auth",consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
 public class UserController {
 
+  private final static Logger logger = LoggerFactory.getLogger(UserController.class);
 
   @Autowired
   private UserDetailsServiceImplementation userService;
@@ -76,20 +79,17 @@ public class UserController {
 
     try{
       token = userService.registerUserAndReturnToken(user);
-      textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token);
-      System.out.println(textMail);
+      textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token.getToken());
 
     }catch(EmailAlreadyExistException e){
       System.out.println(e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists", e);
     } catch(UserNameAlreadyExistException e){
-      System.out.println(e);
+      logger.info("UsernameAlreadyExist Exception was thrown");
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists", e);
     }catch(Exception e){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Sorry something went wrong from Backend");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Sorry something went wrong from Backend",e);
     }
-   ;
-//    String textMail = String.format(mailMessage.getText(), token.toString());
 
     emailService.sendEmail(user.getEmail(),"Confirm newsdMe registration", textMail);
     return new ResponseEntity<>("",HttpStatus.CREATED);
