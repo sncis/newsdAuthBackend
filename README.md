@@ -166,7 +166,27 @@ To do so change the `allowedOrigins` method in the `corsConfigurationSource` Bea
         "GET", "POST", "DELETE", "OPTIONS"));
   
   ```
-  
-  
+ 
+ 
+ 
+ 
+## Security Measurements 
 
+The following list shows different security measurements which had been taken to secure the application. This is not a list of all possible measurements for web application security, but shows what is implemented and applied in the project.
+
+### List of implemented security measurements 
+
+#### Transportation Layer
+* security headers
+* CORS Configuration 
+* only HTTPS connections are allowed for local development and public verison hosted on Heroku
+
+#### Application Layer 
+* Authentication based on username & password and JWT Token
+* Rolebased Authorisation 
+* Email verification for Registration
+* Custom application entrypoint filters
+* validating incomming Data based on JSON Schema
+* Logging 
+* Custom validators to prevent malicious data entering into the DB
   
