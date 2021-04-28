@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
+import java.util.ArrayList;
 
 @Component
 public class CookiesUtils {
@@ -49,6 +50,17 @@ public class CookiesUtils {
       System.out.println(e.getMessage());
     }
     return username;
+   }
+
+   public ArrayList<Cookie> deleteCookies(Cookie[] cookies){
+    ArrayList<Cookie> cookiesToDelete = new ArrayList<>();
+    for(Cookie c : cookies){
+      String name = c.getName();
+      Cookie newCookie = createCookie(name, null,0);
+      cookiesToDelete.add(newCookie);
+     }
+
+    return cookiesToDelete;
    }
 
 }

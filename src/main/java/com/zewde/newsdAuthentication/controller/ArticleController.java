@@ -5,6 +5,8 @@ import com.zewde.newsdAuthentication.entities.Article;
 import com.zewde.newsdAuthentication.service.ArticleService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +20,11 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping(value="/",
-    consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE},
-    produces = MediaType.APPLICATION_JSON_VALUE)
+    consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
 public class ArticleController {
+
+  private final static Logger logger = LoggerFactory.getLogger(ArticleController.class);
+
 
   @Autowired
   ArticleService articleService;
@@ -42,25 +46,31 @@ public class ArticleController {
     }catch(Exception e ){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong",e);
     }
-    System.out.println("artcile in controler");
-    System.out.println(articles);
-
     return new ResponseEntity<>(articles, HttpStatus.OK);
   }
 
   @PostMapping("/articles")
   public ResponseEntity<?> saveBookmarkedArticles(@RequestParam("username") String username, @RequestBody Article article){
-    Article savedArticle;
+    Article savedArticle = null;
+    System.out.println("***********************");
+    System.out.println(article);
+
+    logger.info("************************");
+    logger.info(username);
+
 //    ArrayList<Article> allArticles;
     try{
     int userId = userService.findUserIdByUsername(username);
     article.setUserId(userId);
     savedArticle = articleService.saveBookmarkedArticle(article);
-//      articleService.saveBookmarkedArticle(article);
-//    allArticles = articleService.getArticlesByUsername(username);
 
     }catch(UsernameNotFoundException e){
     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no user with such username found", e);
+    }
+    catch(Exception e){
+      logger.warn("**************************************");
+      logger.error(e.getMessage());
+      logger.error(String.valueOf(e.getCause()));
     }
 //    return new ResponseEntity<>(allArticles, HttpStatus.CREATED);
     return new ResponseEntity<>(savedArticle, HttpStatus.CREATED);

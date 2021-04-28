@@ -24,6 +24,9 @@ public class EmailServerConfig {
   @Value("${spring.mail.password}")
   private String mailServerPassword;
 
+  @Value("${frontend.url}")
+  private String frontendUrl;
+
   @Bean
   public JavaMailSender getMailSender() {
 
@@ -49,7 +52,9 @@ public class EmailServerConfig {
     SimpleMailMessage message = new SimpleMailMessage();
 
     message.setText("Hi from Newsdme \n please click the link below to confirm your registration.\n\n\n\n" +
-        "https://newsdme.herokuapp.com/confirm/2&token=%s\n");
+        frontendUrl+"/confirm/2?token=%s\n");
+
+//        "https://newsdme.herokuapp.com/confirm/2&token=%s\n");
 
     return message;
   }

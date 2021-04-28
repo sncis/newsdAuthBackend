@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class CustomeJWTEntryPoint implements AuthenticationEntryPoint {
+public class CustomJwtExceptionHandlerForEntryPoint implements AuthenticationEntryPoint {
 
   @Autowired
   CookiesUtils cookiesUtils;
@@ -23,6 +23,6 @@ public class CustomeJWTEntryPoint implements AuthenticationEntryPoint {
       throws IOException {
       Cookie cookie = cookiesUtils.createCookie("jwtToken", "", 0);
       res.addCookie(cookie);
-      res.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorised user please login or register");
+      res.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Please Login or register");
   }
 }

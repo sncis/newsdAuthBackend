@@ -23,14 +23,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 
@@ -99,14 +102,17 @@ public class UserController {
   public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response) throws BadCredentialsException, DisabledException{
 
     try{
-      authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+      authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
     }catch(BadCredentialsException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password", e);
     }catch(DisabledException e){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is disabled", e);
-    }catch(Exception e){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is disabled. Please check your email's for Confirmation token", e);
+    }catch(UsernameNotFoundException e){
       System.out.println(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "error from backend", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such username, please register", e);
+    }catch(Exception e ){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry, some unexpected Error occurred!", e);
+
     }
 
     User u = userService.loginUser(user);
@@ -119,14 +125,17 @@ public class UserController {
   }
 
   @GetMapping("/logout")
-  public ResponseEntity<?> logout() {
+  public ResponseEntity<?> logout(HttpServletResponse response, HttpServletRequest request) {
 //    System.out.println("logout Called");
 //    Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
-//    response.addCookie(cookie);
-    return new ResponseEntity<>("is this the boddy",HttpStatus.OK);
+    ArrayList<Cookie> deletedCookies = cookiesUtils.deleteCookies(request.getCookies());
+    for(Cookie c : deletedCookies){
+         response.addCookie(c);
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @GetMapping("/confirmUser")
+  @GetMapping("/confirm")
   public ResponseEntity<?> confirmUser(@RequestParam("token") String token){
     System.out.println(token);
     try{

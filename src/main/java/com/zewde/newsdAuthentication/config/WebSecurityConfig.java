@@ -41,7 +41,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   LoggingFilter loggingFilter;
 
   @Autowired
-  CustomeJWTEntryPoint customeJWTEntryPoint;
+  ArticleJsonFilter articleJsonFilter;
+
+  @Autowired
+  CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
+
+
 
   @Bean
   @Override
@@ -61,11 +66,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
 
-//  @Override
-//  public void configure(WebSecurity web) throws Exception{
-//    web.ignoring().antMatchers("/auth*", "/");
-//  }
-
   @Override
   public void configure(HttpSecurity http) throws Exception{
 
@@ -74,23 +74,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
             .antMatchers("/articles/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
-            .antMatchers("/auth/*", "/", "/favicon.ico").permitAll()
+            .antMatchers("/auth/*", "/", "/favicon.ico", "/error").permitAll()
             .and().authorizeRequests().anyRequest().authenticated().and()
             .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
-        .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .exceptionHandling().authenticationEntryPoint(customeJWTEntryPoint)
-           .and().httpBasic();
-    http
+            .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
+            .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class).exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
+            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+           .and().httpBasic().and()
         .headers()
         .contentTypeOptions()
         .and().xssProtection()
         .and().cacheControl()
         .and().httpStrictTransportSecurity()
         .and().frameOptions()
-        .and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com/"); //only permit resoruces from teh same origine
-    //only alow secured equests
+        .and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com/ https://localhost:3000"); //only permit resoruces from the same origine
+    //only allow secured requests
+    //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
         .requiresSecure();
@@ -107,7 +106,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     config.setAllowedOrigins(Arrays.asList("https://localhost:3000" ,"https://newsdme.herokuapp.com"));
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
-        "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        "GET", "POST", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Accept",

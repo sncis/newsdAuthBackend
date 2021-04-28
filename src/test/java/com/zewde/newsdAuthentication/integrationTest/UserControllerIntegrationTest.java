@@ -88,7 +88,6 @@ public class UserControllerIntegrationTest {
     mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
-//        .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
   }
 
   @Test

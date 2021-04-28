@@ -24,7 +24,9 @@ public class LoggingFilter extends OncePerRequestFilter {
     logger.info("with headers: {}", request.getHeaderNames());
     logger.info(" Request Length {} :  with contnet type {}", request.getContentLength(), request.getContentType());
 
-  chain.doFilter(request, response);
+    System.out.println("################ End of LoggingFilter ##################");
+
+    chain.doFilter(request, response);
   }
 
   @Override

@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Article",
+  "description": "An Article from the NewasApi",
+  "type": "object",
+  "properties":{
+    "_id" : {
+      "description": "The unique identifier for an article",
+      "type": "string"
+    },
+    "userId": {
+      "description": "User identifier from article",
+      "type": "integer"
+    },
+    "_score" : {
+      "description": "score of an article",
+      "type": "number",
+      "minimum": 0
+    },
+    "author" : {
+      "description": "Author of an article",
+      "type": ["string","null"]
+    },
+    "clean_url" : {
+      "description": "Url to source of an article",
+      "type": "string",
+      "pattern": "^([A-Za-z0-9&_\\-#@!?()]{1,40})\\.([a-zA-Z]{2,4})$"
+    },
+    "country" : {
+      "description": "Country in which the article was writte",
+      "type": "string",
+      "pattern": "^([A-Za-z]{2,4})$"
+    },
+    "language" : {
+      "description": "language of the article",
+      "type": "string",
+      "pattern": "^([A-Za-z]{0,2})"
+    },
+    "link" : {
+      "description": "link to the article",
+      "type": "string",
+      "pattern": "^https?:\\/\\/(www\\.)[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+    },
+    "published_date" : {
+      "description": "publishing date of the article",
+      "type": "string",
+      "pattern": "^([0-9]{4})?-([0-9]{0,2})?-([0-9]{0,2})? ([0-9\\:]{0,8})?$"
+    },
+    "rank" : {
+      "description": "rank of the article",
+      "type": "string",
+      "pattern": "^[0-9]{0,256}$"
+    },
+    "rights" : {
+      "description": "rank of the article",
+      "type": "string"
+    },
+    "summary": {
+      "description": "Summary of the article",
+      "type": "string"
+    },
+    "title" : {
+      "description": "rank of the article",
+      "type": "string",
+      "pattern": "^(?=[A-Za-z0-9@:%._+~#=()&$-?!*}{,;'\" ])[^<>\\^]{0,256}$"
+    },
+    "topic" : {
+      "description": "topic of the article",
+      "type": "string"
+    },
+    "bookmarked": {
+      "description": "shows if article is bookmarked",
+      "type": "boolean"
+    }
+  },
+  "required": [ "_id", "bookmarked" ]
+}

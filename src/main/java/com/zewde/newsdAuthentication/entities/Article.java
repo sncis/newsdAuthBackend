@@ -15,7 +15,6 @@ public class Article implements Serializable {
   @Column(name="_id", unique=true)
   private String _id;
 
-
   @Column(name="user_id")
   private int userId;
 
@@ -33,9 +32,6 @@ public class Article implements Serializable {
 
   @Column(name="url")
   private String link;
-
-//  @Column(name="urltoimage")
-//  private String urlToImage;
 
   @Column(name="published_date")
   private String published_date;
@@ -55,14 +51,13 @@ public class Article implements Serializable {
   @Column(name="rights")
   private String rights;
 
-  @Column(name="isbookmarked")
-  private boolean isBookmarked;
-
+  @Column(name="bookmarked")
+  private boolean bookmarked;
 
   public Article(){
   }
 
-  public Article(String _id, int userId, String clean_url, String author, String title, String summary, String link, String published_date, String topic, String country, String language, String rank, String rights, boolean isBookmarked){
+  public Article(String _id, int userId, String clean_url, String author, String title, String summary, String link, String published_date, String topic, String country, String language, String rank, String rights, boolean bookmarked){
     this._id = _id;
     this.userId = userId;
     this.clean_url = clean_url;
@@ -76,7 +71,22 @@ public class Article implements Serializable {
     this.language = language;
     this.rank = rank;
     this.rights = rights;
-    this.isBookmarked= isBookmarked;
+    this.bookmarked = bookmarked;
+  }
+  public Article(String _id, String clean_url, String author, String title, String summary, String link, String published_date, String topic, String country, String language, String rank, String rights, boolean bookmarked){
+    this._id = _id;
+    this.clean_url = clean_url;
+    this.author = author;
+    this.title = title;
+    this.summary = summary;
+    this.link = link;
+    this.published_date = published_date;
+    this.topic = topic;
+    this.country = country;
+    this.language = language;
+    this.rank = rank;
+    this.rights = rights;
+    this.bookmarked = bookmarked;
   }
 
   public String get_id() {
@@ -185,11 +195,11 @@ public class Article implements Serializable {
   }
 
   public boolean isBookmarked() {
-    return isBookmarked;
+    return bookmarked;
   }
 
   public void setBookmarked(boolean bookmarked) {
-    isBookmarked = bookmarked;
+    this.bookmarked = bookmarked;
   }
 
   @Override

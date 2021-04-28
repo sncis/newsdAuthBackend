@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,14 +36,12 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   CookiesUtils cookiesUtils;
 
   @Autowired
-  CustomeJWTEntryPoint authEntrypoint;
+  CustomJwtExceptionHandlerForEntryPoint authEntrypoint;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
     System.out.println("################ Initialising CustomAuthenticationFilter ##################");
     logger.info("Filtering request for uri:" + request.getRequestURI());
-    logger.info("Filtering request for uri:" + request.getPathInfo());
-
 
     String username = null;
     String token = null;
@@ -56,36 +53,49 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         if(SecurityContextHolder.getContext().getAuthentication() == null && JWTTokenUtils.validateToken(username, token)){
           User user = userDetailsService.loadUserByUsername(username);
           setSecurityContext(user,request);
+          chain.doFilter(request,response);
+
         }
-      }catch(AuthenticationException | ExpiredJwtException authex ){
-        assert authex instanceof AuthenticationException;
-        authEntrypoint.commence(request,response, (AuthenticationException) authex);
-      } catch(Exception ex){
+      }catch(AuthenticationException authex ){
+        logger.warn("error in authex");
+        System.out.println(authex.getMessage());
+        SecurityContextHolder.clearContext();
+        authEntrypoint.commence(request,response, authex);
+
+      }
+      catch(ExpiredJwtException jwtexc){
+        logger.warn("JWT Exception cause by : {}", jwtexc.getCause());
+        SecurityContextHolder.clearContext();
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "please Login or register");
+      }
+      catch(Exception ex){
         logger.warn("Exception occurred " + ex.getClass() + " because of " + ex.getMessage());
+        SecurityContextHolder.clearContext();
         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden request");
+
       }
 
-    logger.info("Filtering request for path: " + request.getRequestURI());
-    chain.doFilter(request,response);
+    logger.info("Request filtered successfully: " + request.getRequestURI());
+    System.out.println("################ End of  CustomAuthenticationFilter ##################");
+
 
   }
 
 
   private void setSecurityContext(User user, HttpServletRequest request){
-    UsernamePasswordAuthenticationToken userPassAuthToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), new ArrayList<>());
-
+    UsernamePasswordAuthenticationToken userPassAuthToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
     userPassAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
     SecurityContextHolder.getContext().setAuthentication(userPassAuthToken);
-
   }
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirmUser","/", "/error", "/favicon.ico*");
-
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/logout","/", "/error", "/favicon.ico*");
+    logger.info("Url is contained in notFilter Urls : {}");
+    logger.info(urls.contains(path));
+    logger.info("Request filtered successfully: " + request.getRequestURI());
     return urls.contains(path);
   }
 }
