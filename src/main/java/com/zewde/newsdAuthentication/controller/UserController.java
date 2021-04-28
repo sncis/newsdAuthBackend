@@ -141,7 +141,7 @@ public class UserController {
   public ResponseEntity<?> confirmUser(@RequestParam("token") String token){
     System.out.println(token);
     try{
-      RegistrationConfirmationToken confirmToken =  registrationConfirmationTokenService.getToken(token);
+      RegistrationConfirmationToken confirmToken = registrationConfirmationTokenService.getToken(token);
       System.out.println(confirmToken);
       userService.confirmUser(confirmToken);
 

@@ -19,6 +19,7 @@ public class LoggingFilter extends OncePerRequestFilter {
   @Override
   public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException{
     System.out.println("################ Initialising LoggingFilter ##################");
+    System.out.println("Test to see which deploy is online");
     logger.info("Logging Request {} : {}", request.getMethod(), request.getRequestURI());
     logger.info("for Content path : {}", request.getContextPath());
     logger.info("with headers: {}", request.getHeaderNames());

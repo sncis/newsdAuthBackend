@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
             .antMatchers("/articles/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
-            .antMatchers("/auth/*", "/", "/favicon.ico", "/error").permitAll()
+            .antMatchers("/auth/*", "/", "/favicon", "/error", "/favicon.ico").permitAll()
             .and().authorizeRequests().anyRequest().authenticated().and()
             .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and().cacheControl()
         .and().httpStrictTransportSecurity()
         .and().frameOptions()
-        .and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com/ https://localhost:3000"); //only permit resoruces from the same origine
+        .and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com/ https://localhost:3000; script-src 'self'; img-src 'self'"); //only permit resoruces from the same origine
     //only allow secured requests
     //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()

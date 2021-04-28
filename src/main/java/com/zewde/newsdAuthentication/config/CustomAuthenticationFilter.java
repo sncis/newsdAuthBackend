@@ -41,7 +41,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
     System.out.println("################ Initialising CustomAuthenticationFilter ##################");
-    logger.info("Filtering request for uri:" + request.getRequestURI());
 
     String username = null;
     String token = null;
@@ -64,7 +63,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
       }
       catch(ExpiredJwtException jwtexc){
-        logger.warn("JWT Exception cause by : {}", jwtexc.getCause());
+        logger.warn("JWT Exception cause by : "+ jwtexc.getMessage());
+        logger.warn(jwtexc.getMessage());
         SecurityContextHolder.clearContext();
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "please Login or register");
       }
@@ -92,10 +92,12 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/logout","/", "/error", "/favicon.ico*");
-    logger.info("Url is contained in notFilter Urls : {}");
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/logout","/", "/error", "/favicon", "/favicon.ico");
+    logger.info("Url is contained in notFilter Urls : {} " + request.getRequestURI());
+    for(String s : urls){
+      logger.info("uri not filtered : {}" +s);
+    }
     logger.info(urls.contains(path));
-    logger.info("Request filtered successfully: " + request.getRequestURI());
     return urls.contains(path);
   }
 }

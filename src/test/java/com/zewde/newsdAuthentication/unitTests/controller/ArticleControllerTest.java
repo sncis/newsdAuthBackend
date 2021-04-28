@@ -23,9 +23,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.Cookie;
+import java.security.Principal;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,6 +43,7 @@ public class ArticleControllerTest {
   @Mock
   ArticleService articleService;
 
+
   @Mock
   UserDetailsServiceImplementation userService;
 
@@ -49,27 +52,31 @@ public class ArticleControllerTest {
 
   private MockMvc mockMvc;
 
+  private Principal mockPrinciple;
 
   @Before
   public void setUp(){
     mockMvc = MockMvcBuilders.standaloneSetup(articleController).build();
+    mockPrinciple = mock(Principal.class);
 
   }
+
   @Test
   public void getArticlesPerUser() throws Exception {
     Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
     Article article2 = new Article("2", 2,"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true);
-
     ArrayList<Article> articles = new ArrayList<>();
     articles.add(article1);
     articles.add(article2);
+
     String token = jwtTokenUtils.generateToken("someUser");
     Cookie c = new Cookie("jwtToken", token);
+    when(mockPrinciple.getName()).thenReturn("someUser");
 
 
     when(articleService.getArticlesByUsername(any(String.class))).thenReturn(articles);
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/articles?username=someUser").contentType(MediaType.APPLICATION_JSON))
+    mockMvc.perform(MockMvcRequestBuilders.get("/articles").principal(mockPrinciple).contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value("1"))
@@ -82,11 +89,12 @@ public class ArticleControllerTest {
   public void saveBookmarkedArticles() throws Exception {
     Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
     String json = new ObjectMapper().writeValueAsString(article1);
+    when(mockPrinciple.getName()).thenReturn("someUser");
 
     when(userService.findUserIdByUsername(any(String.class))).thenReturn(1);
     when(articleService.saveBookmarkedArticle(any(Article.class))).thenReturn(article1);
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/articles?username=someUser").contentType(MediaType.APPLICATION_JSON).content(json))
+    mockMvc.perform(MockMvcRequestBuilders.post("/articles").principal(mockPrinciple).contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("some title"));
   }
@@ -97,9 +105,10 @@ public class ArticleControllerTest {
 
     String json = new ObjectMapper().writeValueAsString(article1);
 
+    when(mockPrinciple.getName()).thenReturn("someUser");
     when(userService.findUserIdByUsername(any(String.class))).thenThrow(new UsernameNotFoundException(""));
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/articles?username=someUser").contentType(MediaType.APPLICATION_JSON).content(json))
+    mockMvc.perform(MockMvcRequestBuilders.post("/articles").principal(mockPrinciple).contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("no user with such username found"));
   }
@@ -107,8 +116,9 @@ public class ArticleControllerTest {
   @Test
   public void shouldReturnNewResponseStatusException_whenWrongUsername() throws Exception {
     when(articleService.getArticlesByUsername(any(String.class))).thenThrow(new UsernameNotFoundException(""));
+    when(mockPrinciple.getName()).thenReturn("someUser");
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/articles?username=soser").contentType(MediaType.APPLICATION_JSON))
+    mockMvc.perform(MockMvcRequestBuilders.get("/articles").principal(mockPrinciple).contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("no such username"));
   }
