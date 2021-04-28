@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ArticleControllerIntegrationTest {
 
-//  @Autowired
+  //  @Autowired
   private MockMvc mockMvc;
 
   @Autowired
@@ -115,7 +115,7 @@ public class ArticleControllerIntegrationTest {
     User user = userRepository.findByUsername(USERNAME).get();
     String token = jwtTokenUtils.generateToken(USERNAME);
 
-   Article article = new Article("2", user.getId(),"kitv","other  author","other title", "other summary","ht://www.kitv.com/story/42196143/to-cap-off-his-amazing-week-", "2020-06-01 16:11:00", "tpoic", "EN", "en", "12345","Copyright 2000 - ",true);
+    Article article = new Article("2", user.getId(),"kitv","other  author","other title", "other summary","ht://www.kitv.com/story/42196143/to-cap-off-his-amazing-week-", "2020-06-01 16:11:00", "tpoic", "EN", "en", "12345","Copyright 2000 - ",true);
     ObjectMapper om = new ObjectMapper();
     String jsonArticle = om.writeValueAsString(article);
 

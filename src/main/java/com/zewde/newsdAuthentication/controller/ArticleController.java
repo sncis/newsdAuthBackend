@@ -52,7 +52,7 @@ public class ArticleController {
   @PostMapping("/articles")
   public ResponseEntity<?> saveBookmarkedArticles(Principal principal, @RequestBody Article article){
     Article savedArticle = null;
-//    ArrayList<Article> allArticles;
+
     try{
     int userId = userService.findUserIdByUsername(principal.getName());
     article.setUserId(userId);

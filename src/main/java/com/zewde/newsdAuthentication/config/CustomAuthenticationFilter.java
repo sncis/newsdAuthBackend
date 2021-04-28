@@ -92,11 +92,13 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
+
     List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/logout","/", "/error", "/favicon", "/favicon.ico");
     logger.info("Url is contained in notFilter Urls : {} " + request.getRequestURI());
     for(String s : urls){
       logger.info("uri not filtered : {}" +s);
     }
+
     logger.info(urls.contains(path));
     return urls.contains(path);
   }
