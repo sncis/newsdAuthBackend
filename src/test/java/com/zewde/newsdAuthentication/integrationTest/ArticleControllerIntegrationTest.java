@@ -22,7 +22,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Cookie;
+import java.security.Principal;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ArticleControllerIntegrationTest {
 
-//  @Autowired
+  //  @Autowired
   private MockMvc mockMvc;
 
   @Autowired
@@ -63,6 +66,8 @@ public class ArticleControllerIntegrationTest {
 
   private String USERNAME = "someTestUser";
 
+  private Principal mockPrinciple;
+
 
 
   @BeforeAll
@@ -74,6 +79,7 @@ public class ArticleControllerIntegrationTest {
     user.setEnabled(true);
 
     userRepository.save(user);
+
 //
 //    mockMvc = MockMvcBuilders
 //        .webAppContextSetup(context)
@@ -86,6 +92,8 @@ public class ArticleControllerIntegrationTest {
         .webAppContextSetup(this.context)
         .apply(springSecurity())
         .build();
+
+    mockPrinciple = mock(Principal.class);
   }
 
   @Test
@@ -95,8 +103,10 @@ public class ArticleControllerIntegrationTest {
     articleRepository.save(new Article("2", user.getId(),"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true));
     String token = jwtTokenUtils.generateToken(USERNAME);
 
-    this.mockMvc.perform(MockMvcRequestBuilders.get("/articles?username="+USERNAME).with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
-    .andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value(1))
+    when(mockPrinciple.getName()).thenReturn(USERNAME);
+
+    this.mockMvc.perform(MockMvcRequestBuilders.get("/articles").with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
+        .andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value(1))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("some title"));
 
   }
@@ -105,7 +115,7 @@ public class ArticleControllerIntegrationTest {
     User user = userRepository.findByUsername(USERNAME).get();
     String token = jwtTokenUtils.generateToken(USERNAME);
 
-   Article article = new Article("2", user.getId(),"kitv","other  author","other title", "other summary","ht://www.kitv.com/story/42196143/to-cap-off-his-amazing-week-", "2020-06-01 16:11:00", "tpoic", "EN", "en", "12345","Copyright 2000 - ",true);
+    Article article = new Article("2", user.getId(),"kitv","other  author","other title", "other summary","ht://www.kitv.com/story/42196143/to-cap-off-his-amazing-week-", "2020-06-01 16:11:00", "tpoic", "EN", "en", "12345","Copyright 2000 - ",true);
     ObjectMapper om = new ObjectMapper();
     String jsonArticle = om.writeValueAsString(article);
 

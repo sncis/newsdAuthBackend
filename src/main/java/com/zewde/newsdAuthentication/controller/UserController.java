@@ -23,6 +23,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -124,7 +125,7 @@ public class UserController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @GetMapping("/logout")
+  @PostMapping("/logout")
   public ResponseEntity<?> logout(HttpServletResponse response, HttpServletRequest request) {
 //    System.out.println("logout Called");
 //    Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
@@ -132,6 +133,7 @@ public class UserController {
     for(Cookie c : deletedCookies){
          response.addCookie(c);
     }
+    SecurityContextHolder.clearContext();
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

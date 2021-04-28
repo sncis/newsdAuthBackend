@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.ArrayList;
 
 @RestController
@@ -36,11 +36,11 @@ public class ArticleController {
   JWTTokenUtils jwtTokenUtils;
 
   @GetMapping("/articles")
-  public ResponseEntity<?> getArticlesPerUser(@RequestParam("username") String user, HttpServletRequest req){
+  public ResponseEntity<?> getArticlesPerUser(Principal principal){
     ArrayList<Article> articles;
 
     try{
-      articles= articleService.getArticlesByUsername(user);
+      articles= articleService.getArticlesByUsername(principal.getName());
     }catch(UsernameNotFoundException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no such username",e);
     }catch(Exception e ){
@@ -50,17 +50,11 @@ public class ArticleController {
   }
 
   @PostMapping("/articles")
-  public ResponseEntity<?> saveBookmarkedArticles(@RequestParam("username") String username, @RequestBody Article article){
+  public ResponseEntity<?> saveBookmarkedArticles(Principal principal, @RequestBody Article article){
     Article savedArticle = null;
-    System.out.println("***********************");
-    System.out.println(article);
 
-    logger.info("************************");
-    logger.info(username);
-
-//    ArrayList<Article> allArticles;
     try{
-    int userId = userService.findUserIdByUsername(username);
+    int userId = userService.findUserIdByUsername(principal.getName());
     article.setUserId(userId);
     savedArticle = articleService.saveBookmarkedArticle(article);
 
