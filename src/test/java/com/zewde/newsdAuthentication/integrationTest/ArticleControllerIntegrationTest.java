@@ -22,7 +22,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Cookie;
+import java.security.Principal;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,6 +66,8 @@ public class ArticleControllerIntegrationTest {
 
   private String USERNAME = "someTestUser";
 
+  private Principal mockPrinciple;
+
 
 
   @BeforeAll
@@ -74,6 +79,7 @@ public class ArticleControllerIntegrationTest {
     user.setEnabled(true);
 
     userRepository.save(user);
+
 //
 //    mockMvc = MockMvcBuilders
 //        .webAppContextSetup(context)
@@ -86,6 +92,8 @@ public class ArticleControllerIntegrationTest {
         .webAppContextSetup(this.context)
         .apply(springSecurity())
         .build();
+
+    mockPrinciple = mock(Principal.class);
   }
 
   @Test
@@ -95,7 +103,9 @@ public class ArticleControllerIntegrationTest {
     articleRepository.save(new Article("2", user.getId(),"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true));
     String token = jwtTokenUtils.generateToken(USERNAME);
 
-    this.mockMvc.perform(MockMvcRequestBuilders.get("/articles?username="+USERNAME).with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
+    when(mockPrinciple.getName()).thenReturn(USERNAME);
+
+    this.mockMvc.perform(MockMvcRequestBuilders.get("/articles").with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
     .andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value(1))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("some title"));
 

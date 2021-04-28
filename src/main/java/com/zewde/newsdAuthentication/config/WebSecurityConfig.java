@@ -44,6 +44,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   ArticleJsonFilter articleJsonFilter;
 
   @Autowired
+  CsrfCookieFilter csrfCookieFilter;
+
+  @Autowired
   CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
 
 
@@ -78,7 +81,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and().authorizeRequests().anyRequest().authenticated().and()
             .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
-            .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class).exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
+            .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
+            .addFilterAfter(csrfCookieFilter,BasicAuthenticationFilter.class)
+            .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic().and()
         .headers()
@@ -129,6 +134,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     return source;
   }
+
 
 
 }
