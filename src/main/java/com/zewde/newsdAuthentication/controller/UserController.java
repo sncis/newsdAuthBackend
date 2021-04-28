@@ -36,9 +36,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
+//@RequestMapping(value="/", consumes="text/plain; charset: utf-8;application/json")
 
 @RestController
 @RequestMapping(value="/auth",consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
+
 public class UserController {
 
   private final static Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -132,7 +134,7 @@ public class UserController {
     for(Cookie c : deletedCookies){
          response.addCookie(c);
     }
-    return new ResponseEntity<>(HttpStatus.OK);
+  return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @GetMapping("/confirm")

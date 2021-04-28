@@ -94,6 +94,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
         .requiresSecure();
 
+
   }
 
     // ntry point is for defining waht to send back when error occures
