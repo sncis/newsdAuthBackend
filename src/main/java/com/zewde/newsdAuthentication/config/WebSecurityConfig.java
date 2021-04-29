@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -46,7 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
 
-
+  @Autowired
+  SameSiteCookieFilter sameSiteCookieFilter;
 
   @Bean
   @Override
@@ -66,11 +68,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
 
+
+
   @Override
   public void configure(HttpSecurity http) throws Exception{
 
         http.cors().and().csrf().disable()
-//        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
             .antMatchers("/articles/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
@@ -79,6 +83,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(applicationEntryPointLoggingFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
+            .addFilterAfter(sameSiteCookieFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic().and()
@@ -86,9 +91,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .contentTypeOptions()
         .and().xssProtection()
         .and().cacheControl()
-        .and().httpStrictTransportSecurity()
-        .and().frameOptions()
-        .and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com https://localhost:3000"); //only permit resoruces from the same origine
+        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com https://localhost:3000") //only permit resoruces from the same origine
+        .and().frameOptions().sameOrigin().disable();
     //only allow secured requests
     //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()
@@ -114,17 +118,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "Accept",
         "Cache-Control",
         "Content-Type",
-        "Access-Control-Allow-Origin",
-        "Access-Control-Allow-Headers",
-        "Access-Control-Allow-Credentials",
-        "Access-Control-Allow-Methods",
+        "Access-Control-Allow-*",
+//        "Access-Control-Allow-Headers",
+//        "Access-Control-Allow-Credentials",
+//        "Access-Control-Allow-Methods",
         "x-frame-options",
         "x-xsrf-token",
         "Strict-Transport-Security",
         "Content-Security-Policy",
         "X-Content-Type-Options",
         "X-XSS-Protection",
-        "X-Forwarded-Proto"));
+        "X-Forwarded-Proto"
+));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
 

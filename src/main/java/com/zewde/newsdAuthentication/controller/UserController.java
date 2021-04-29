@@ -125,7 +125,7 @@ public class UserController {
     Cookie cookie = cookiesUtils.createCookie("jwtToken", token);
     System.out.println(cookie);
     response.addCookie(cookie);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>("successfuly loged in",HttpStatus.OK);
   }
 
 
