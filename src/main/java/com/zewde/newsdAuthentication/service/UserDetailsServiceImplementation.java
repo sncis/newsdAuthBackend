@@ -1,6 +1,7 @@
 package com.zewde.newsdAuthentication.service;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
+import com.zewde.newsdAuthentication.Exceptions.UserLoginBlockedException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
@@ -32,13 +33,21 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   @Autowired
   private RegistrationConfirmationTokenService registrationTokenService;
 
+  @Autowired
+  private LoginFailureService loginFailureService;
+
 
   @Override
   public User loadUserByUsername(String username){
+
+    String ipAddress = loginFailureService.getIpAddress();
+    if(loginFailureService.isBlocked(ipAddress)){
+      throw new UserLoginBlockedException("user is blocked");
+    }
+
     Optional<User> user = userRepository.findByUsername(username);
 
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
-
     return user.map(User::new).get();
   }
 

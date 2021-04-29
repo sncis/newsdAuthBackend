@@ -64,6 +64,7 @@ public class ArticleControllerIntegrationTest {
   private JWTTokenUtils jwtTokenUtils;
 
 
+
   private String USERNAME = "someTestUser";
 
   private Principal mockPrinciple;
@@ -105,10 +106,9 @@ public class ArticleControllerIntegrationTest {
 
     when(mockPrinciple.getName()).thenReturn(USERNAME);
 
-    this.mockMvc.perform(MockMvcRequestBuilders.get("/articles").with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
+    this.mockMvc.perform(MockMvcRequestBuilders.get("/articles").contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
     .andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value(1))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("some title"));
-
   }
   @Test
   public void shouldThrowError_WhenPostingInvalidArticle() throws Exception{
@@ -119,7 +119,7 @@ public class ArticleControllerIntegrationTest {
     ObjectMapper om = new ObjectMapper();
     String jsonArticle = om.writeValueAsString(article);
 
-    this.mockMvc.perform(post("/articles?username="+USERNAME).contentType(MediaType.APPLICATION_JSON).content(jsonArticle).with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
+    this.mockMvc.perform(post("/articles").contentType(MediaType.APPLICATION_JSON).content(jsonArticle).with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
         .andExpect(status().isBadRequest()).andExpect(status().reason("Article Data are not valid! Article cannot stored"));
 
   }

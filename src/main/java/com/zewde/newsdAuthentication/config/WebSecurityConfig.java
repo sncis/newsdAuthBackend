@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
   @Autowired
-  LoggingFilter loggingFilter;
+  ApplicationEntryPointLoggingFilter applicationEntryPointLoggingFilter;
 
   @Autowired
   ArticleJsonFilter articleJsonFilter;
@@ -76,7 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
             .antMatchers("/auth/*", "/", "/favicon", "/error", "/favicon.ico").permitAll()
             .and().authorizeRequests().anyRequest().authenticated().and()
-            .addFilterBefore(loggingFilter, SecurityContextPersistenceFilter.class)
+            .addFilterBefore(applicationEntryPointLoggingFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)

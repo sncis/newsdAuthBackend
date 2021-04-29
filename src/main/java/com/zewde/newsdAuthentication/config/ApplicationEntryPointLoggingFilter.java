@@ -13,17 +13,18 @@ import java.io.IOException;
 
 @Component
 //@Order(1)
-public class LoggingFilter extends OncePerRequestFilter {
-  private final static Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
+public class ApplicationEntryPointLoggingFilter extends OncePerRequestFilter {
+  private final static Logger logger = LoggerFactory.getLogger(ApplicationEntryPointLoggingFilter.class);
 
   @Override
   public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException{
-    System.out.println("################ Initialising LoggingFilter ##################");
-    System.out.println("Test to see which deploy is online1234");
-    logger.info("Logging Request {} : {}", request.getMethod(), request.getRequestURI());
-    logger.info("for Content path : {}", request.getContextPath());
-    logger.info("with headers: {}", request.getHeaderNames());
-    logger.info(" Request Length {} :  with contnet type {}", request.getContentLength(), request.getContentType());
+
+    String ipAddress = request.getRemoteAddr()  != null ? request.getRemoteAddr() : request.getHeader("X-FORWARDED-FOR");
+    System.out.println("################ Initialising ApplicationEntryPointLoggingFilter ##################");
+
+    logger.info("Logging Request from ipAdresse: {}", ipAddress);
+    logger.info("For request method: {}   and path : {}", request.getMethod(), request.getContextPath());
+    logger.info("Request Length {} :  with contnet type {}", request.getContentLength(), request.getContentType());
 
     System.out.println("################ End of LoggingFilter ##################");
 

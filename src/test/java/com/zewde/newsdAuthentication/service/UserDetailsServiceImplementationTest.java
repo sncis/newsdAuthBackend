@@ -33,6 +33,9 @@ public class UserDetailsServiceImplementationTest {
   private UserRepository userRepository;
 
   @Mock
+  private LoginFailureService loginFailureService;
+
+  @Mock
   private BCryptPasswordEncoder passwordEncoder;
 
   @Mock
@@ -50,6 +53,7 @@ public class UserDetailsServiceImplementationTest {
   @Test
   public void loadUserByUsername() {
     User u = createUser();
+    when(loginFailureService.getIpAddress()).thenReturn("12345");
     when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(u));
 
     User userDetails = userDetailsServiceImplementation.loadUserByUsername(u.getUsername());
@@ -97,6 +101,7 @@ public class UserDetailsServiceImplementationTest {
   @Test
   public void loginUser(){
     User u = createUser();
+    when(loginFailureService.getIpAddress()).thenReturn("12345");
 
     when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(u));
 
@@ -108,6 +113,8 @@ public class UserDetailsServiceImplementationTest {
 
   @Test(expected = UsernameNotFoundException.class)
   public void login_shouldThrowUsernameNotFoundException_WhenWrongUsername(){
+    when(loginFailureService.getIpAddress()).thenReturn("12345");
+
     when(userRepository.findByUsername(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
 
     userDetailsServiceImplementation.loginUser(createUser());
@@ -125,6 +132,8 @@ public class UserDetailsServiceImplementationTest {
 
   @Test(expected = UsernameNotFoundException.class)
   public void create_ShouldThrowUsernameNotFoundException(){
+    when(loginFailureService.getIpAddress()).thenReturn("12345");
+
     when(userRepository.findByUsername(any(String.class))).thenThrow(new UsernameNotFoundException("userName not found"));
 
     userDetailsServiceImplementation.loginUser(createUser());

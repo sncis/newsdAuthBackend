@@ -3,6 +3,7 @@ package com.zewde.newsdAuthentication.controller;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
+import com.zewde.newsdAuthentication.Exceptions.UserLoginBlockedException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
@@ -103,6 +104,8 @@ public class UserController {
 
     try{
       authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
+      User u = userService.loginUser(user);
+      String token = jwtTokenUtils.generateToken(u.getUsername());
     }catch(BadCredentialsException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password", e);
     }catch(DisabledException e){
@@ -110,9 +113,10 @@ public class UserController {
     }catch(UsernameNotFoundException e){
       System.out.println(e.getMessage());
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such username, please register", e);
+    }catch(UserLoginBlockedException e ){
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "we locked you account because of to many attempts",e);
     }catch(Exception e ){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry, some unexpected Error occurred!", e);
-
     }
 
     User u = userService.loginUser(user);

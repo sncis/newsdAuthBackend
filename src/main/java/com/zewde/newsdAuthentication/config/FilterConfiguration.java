@@ -15,9 +15,9 @@ public class FilterConfiguration {
 
 //
 //  @Bean
-  public FilterRegistrationBean<LoggingFilter> loggingFilter(){
-    FilterRegistrationBean<LoggingFilter> registrationBean = new FilterRegistrationBean<>();
-    registrationBean.setFilter(new LoggingFilter());
+  public FilterRegistrationBean<ApplicationEntryPointLoggingFilter> loggingFilter(){
+    FilterRegistrationBean<ApplicationEntryPointLoggingFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new ApplicationEntryPointLoggingFilter());
     registrationBean.addUrlPatterns("/*");
     return registrationBean;
   }
