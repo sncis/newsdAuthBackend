@@ -69,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   public void configure(HttpSecurity http) throws Exception{
 
-        http.cors().and()
+        http.cors().and().csrf().disable()
 //        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
             .antMatchers("/articles/admin").hasAuthority("ADMIN")
