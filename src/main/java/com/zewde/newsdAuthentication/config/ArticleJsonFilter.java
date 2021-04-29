@@ -81,7 +81,7 @@ public class ArticleJsonFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request)
       throws ServletException {
     String path = request.getRequestURI();
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/logout","/auth/confirm","/", "/error", "/favicon.ico*");
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/logout","/auth/confirm","/", "/error", "/favicon.ico", "/favicon");
 
     return urls.contains(path);
   }

@@ -62,20 +62,16 @@ public class ArticleController {
     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no user with such username found", e);
     }
     catch(Exception e){
-      logger.warn("**************************************");
-      logger.error(e.getMessage());
-      logger.error(String.valueOf(e.getCause()));
+      logger.error("Error when storing article : " + e.getMessage());
+      logger.error("Error cause by : " + e.getCause());
     }
-//    return new ResponseEntity<>(allArticles, HttpStatus.CREATED);
     return new ResponseEntity<>(savedArticle, HttpStatus.CREATED);
-
   }
 
 
 
   @DeleteMapping("/articles/article")
   public ResponseEntity<?> deleteUnbookmarkedArticle(@RequestParam("id") String id){
-    ArrayList<Article> articles;
     try{
       articleService.deleteUnbookmarkedArticle(id);
     }catch(ArticleNotFoundException e){
@@ -86,7 +82,7 @@ public class ArticleController {
 
   @GetMapping("/admin")
   public ResponseEntity<?> getAdminSide(){
-    return new ResponseEntity<>("hello Mrs. Admin", HttpStatus.OK);
+    return new ResponseEntity<>("Hello Mrs. Admin", HttpStatus.OK);
   }
 
 }

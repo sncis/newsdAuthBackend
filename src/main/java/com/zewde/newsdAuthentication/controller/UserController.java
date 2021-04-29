@@ -6,7 +6,6 @@ import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNot
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
-import com.zewde.newsdAuthentication.service.ArticleService;
 import com.zewde.newsdAuthentication.service.EmailService;
 import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
@@ -23,21 +22,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
-
-//@RequestMapping(value="/", consumes="text/plain; charset: utf-8;application/json")
 
 @RestController
 @RequestMapping(value="/auth",consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE})
@@ -54,9 +48,6 @@ public class UserController {
 
   @Autowired
   private JWTTokenUtils jwtTokenUtils;
-
-  @Autowired
-  private ArticleService articleService;
 
   @Autowired
   private CookiesUtils cookiesUtils;
@@ -101,6 +92,12 @@ public class UserController {
     return new ResponseEntity<>("",HttpStatus.CREATED);
   }
 
+  @GetMapping("/login")
+  public ResponseEntity<?>getLogin(){
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+
   @PostMapping("/login")
   public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response) throws BadCredentialsException, DisabledException{
 
@@ -127,19 +124,6 @@ public class UserController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @PostMapping("/logout")
-  public ResponseEntity<?> logout(HttpServletResponse response, HttpServletRequest request) {
-//    System.out.println("logout Called");
-//    Cookie cookie = cookiesUtils.createCookie("jwtToken", "",0);
-    ArrayList<Cookie> deletedCookies = cookiesUtils.deleteCookies(request.getCookies());
-    for(Cookie c : deletedCookies){
-         response.addCookie(c);
-    }
-
-    SecurityContextHolder.clearContext();
-    return new ResponseEntity<>(HttpStatus.OK);
-
-  }
 
   @GetMapping("/confirm")
   public ResponseEntity<?> confirmUser(@RequestParam("token") String token){
