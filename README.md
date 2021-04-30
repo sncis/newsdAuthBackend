@@ -7,12 +7,15 @@ newsdAuthentication is a simple REST API for authenticating users and retrieving
 The Frontend for this Application can be found in this [Git Repo](https://github.com/snzew/newsd).  
 A live version of the whole Project is hosted on Heroku and can be found here --> [NewsdMe](https://newsdme.herokuapp.com/)  
 
-This REST Api has two main Endpoints, one for Authentication and one for Articles stored by authenticated users.  
-
+This REST Api has two main Endpoints, one for Authentication and one for Articles stored by authenticated users. 
+Once registered, you will get a Email to the provided email Address, which will redirect you to the page to confirm your registration. You con also resend the registration code if you missed it. 
+If you have more then 5 failed login Attempts your Ip address will be blocked for 5 minutes. This configurations (maxAttempts and time) cna be configured (see section `Restricting login attempts`).
 There is also one minor Endpoint for `Admins` which is only for demonstrating a role based authorisation concept.  
 
+
 In Addition, the project showcases some security measurements taken to protect a REST Api. These measurements are presented in the Security section of this README file. It is build with `Spring Boot`with `maven` and uses the `Spring Security` Framework to customize authentication and access-control.  
-  
+Some of them are: filtering incoming request, having costume validators to validate data before storing them, implemented security headers and using HTTPS . 
+a Whole list can be found at the end of this file. 
   
   
 
@@ -53,7 +56,7 @@ newsdAuthentication has 3 endpoints:
  
  ## Getting Started
   
-newsdAuthentication in a `Java Spring Boot` Application built with `Java 11`. As project management tool it is using `maven`.  
+newsdAuthentication in a `Java Spring Boot` Application built with `Java 11`. As project management tool it is using `maven` and as database `Postgres`.  
   
 To send emails to users to confirm their registration the `GMail` mail client is used. For the sake of simplicity the credentials are populated in the in the application-dev.properties file.  
 
@@ -166,8 +169,43 @@ To do so change the `allowedOrigins` method in the `corsConfigurationSource` Bea
         "GET", "POST", "DELETE", "OPTIONS"));
   
   ```
+
+### Restricting login attempts
+To prevent Brute Force attacks, login attempts are restricted and the given IP address is blocked for a given amount of time.\n
+The number of Login tries and the time for how long the IP Address is blocked can be customised. 
+
+To change the possible failed login attempts change the MAX_ATTEMPTS in the LoginFailureService in the service directory.
+```$xslt
+
+@Service
+public class LoginFailureService {
+
+  @Autowired
+  HttpServletRequest request;
+
+  private final int MAX_ATTEMPTS = 5;
+  private LoadingCache<String, Integer> cachedAttempts;
+```
  
  
+... to change the time for how long the IP Address is blocked can be changed in the same file by changing "expiresAfterWrites" method in the constructor.
+
+```$xslt
+
+  public LoginFailureService(){
+    super();
+    cachedAttempts = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
+      @Override
+      public Integer load(String s) throws Exception {
+        return 0;
+      }
+    });
+
+  }
+
+```
+
+
  
  
 ## Security Measurements 
@@ -178,15 +216,19 @@ The following list shows different security measurements which had been taken to
 
 #### Transportation Layer
 * security headers
-* CORS Configuration 
-* only HTTPS connections are allowed for local development and public verison hosted on Heroku
+* CORS Configuration (Working on local environment. In Production their is an unknown issue and I was not able to fix it yet, due to time reasons.)
+* only HTTPS connections are allowed for local development and public version hosted on Heroku
+
 
 #### Application Layer 
 * Authentication based on username & password and JWT Token
+* Password encoding
 * Rolebased Authorisation 
 * Email verification for Registration
 * Custom application entrypoint filters
-* validating incomming Data based on JSON Schema
+* validating incoming Article data based on JSON Schema
 * Logging 
-* Custom validators to prevent malicious data entering into the DB
+* Custom validators to validate incoming data
+* Restricting Login attempts
+* Rejecting too long request body
   

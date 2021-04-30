@@ -41,7 +41,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
     System.out.println("################ Initialising CustomAuthenticationFilter ##################");
-    logger.info("Filtering request for uri:" + request.getRequestURI());
+    logger.info("Filtering request for uri: " + request.getRequestURI());
 
     String username = null;
     String token = null;
@@ -53,7 +53,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         if(SecurityContextHolder.getContext().getAuthentication() == null && JWTTokenUtils.validateToken(username, token)){
           User user = userDetailsService.loadUserByUsername(username);
           setSecurityContext(user,request);
-          logger.info("User successfully authenticated");
+          logger.info("User successfully authenticated \n");
           chain.doFilter(request,response);
         }
 
@@ -68,15 +68,15 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         logger.warn("JWT Exception cause by : " + jwtexc.getCause());
         logger.warn(jwtexc.getMessage());
         SecurityContextHolder.clearContext();
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please Login or Register");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please Login or Register!");
       }
       catch(Exception ex){
         logger.warn("Exception occurred " + ex.getClass() + " because of " + ex.getMessage());
         SecurityContextHolder.clearContext();
-        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden request");
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden request! \n");
 
       }
-    logger.info("Request filtered successfully: " + request.getRequestURI());
+    logger.info("Request for URI :  {}  successfully filtered\n " + request.getRequestURI());
 
     System.out.println("################ End of  CustomAuthenticationFilter ##################");
   }
@@ -93,9 +93,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException {
     String path = request.getRequestURI();
 
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/","/logout", "/error", "/favicon", "/favicon.ico");
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/resendConfirmationToken","/","/logout", "/error", "/favicon", "/favicon.ico");
 
-    logger.info("Url is filtered" + urls.contains(path));
+    logger.info("Url should be filtered " + urls.contains(path));
     return urls.contains(path);
   }
 }

@@ -83,7 +83,7 @@ public class UserDetailsServiceImplementationTest {
   @Test(expected = EmailAlreadyExistException.class)
   public void register_shouldThrowEmailAlreadyExistException_WhenEmailAlreadyExist() {
     User u = createUser();
-    when(userRepository.findAllByEmail(any(String.class))).thenReturn(u);
+    when(userRepository.findAllByEmail(any(String.class))).thenReturn(Optional.of(u));
 
     userDetailsServiceImplementation.registerUser(u);
 

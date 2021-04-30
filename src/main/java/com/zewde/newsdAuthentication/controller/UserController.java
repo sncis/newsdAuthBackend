@@ -105,7 +105,6 @@ public class UserController {
     try{
       authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
       User u = userService.loginUser(user);
-      String token = jwtTokenUtils.generateToken(u.getUsername());
     }catch(BadCredentialsException e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password", e);
     }catch(DisabledException e){
@@ -125,25 +124,38 @@ public class UserController {
     Cookie cookie = cookiesUtils.createCookie("jwtToken", token);
     System.out.println(cookie);
     response.addCookie(cookie);
-    return new ResponseEntity<>("successfuly loged in",HttpStatus.OK);
+    return new ResponseEntity<>("successfully logged in",HttpStatus.OK);
   }
 
 
   @GetMapping("/confirm")
-  public ResponseEntity<?> confirmUser(@RequestParam("token") String token){
-    System.out.println(token);
+  public ResponseEntity<?> confirmUser(@Valid @RequestParam("token") String token){
     try{
-      RegistrationConfirmationToken confirmToken = registrationConfirmationTokenService.getToken(token);
-      System.out.println(confirmToken);
-      userService.confirmUser(confirmToken);
+//      RegistrationConfirmationToken confirmToken = registrationConfirmationTokenService.getToken(token);
+//      System.out.println(confirmToken);
+      userService.confirmUser(token);
 
     }catch(RegistrationConfirmationTokenNotFoundException ex){
 
-      return new ResponseEntity<>(ex,HttpStatus.BAD_REQUEST);
+      throw  new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
     return new ResponseEntity<>("registration confirmation successful",HttpStatus.OK);
+  }
 
+  @PostMapping("/resendConfirmationToken")
+  public ResponseEntity<?> resendConfirmationToken(@Valid @RequestBody String email){
+    RegistrationConfirmationToken token;
+    try{
+      token = userService.findTokenByUserEmail(email);
+    }catch(UsernameNotFoundException e){
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no such user");
+    }
+
+    String textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token.getToken());
+    emailService.sendEmail(email,"Confirm newsdMe registration", textMail);
+
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }

@@ -1,6 +1,8 @@
 package com.zewde.newsdAuthentication.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -15,6 +17,9 @@ public class RegistrationConfirmationToken {
   private Long id;
 
 
+//  @ValidRegistrationToken
+  @NotNull
+  @NotEmpty
   private String token;
 
   private LocalDate date;

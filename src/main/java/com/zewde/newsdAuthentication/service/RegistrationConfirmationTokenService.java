@@ -2,6 +2,7 @@ package com.zewde.newsdAuthentication.service;
 
 import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
+import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.repositories.RegistrationConfirmationTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class RegistrationConfirmationTokenService {
 
   public RegistrationConfirmationToken getToken(String token){
     Optional<RegistrationConfirmationToken> confirmationToken = tokenRepo.findRegistrationConfirmationTokenByToken(token);
+
     confirmationToken.orElseThrow(RegistrationConfirmationTokenNotFoundException::new);
 
     return confirmationToken.map(RegistrationConfirmationToken::new).get();
@@ -30,5 +32,15 @@ public class RegistrationConfirmationTokenService {
 
   public void deleteToken(Long id){
     tokenRepo.deleteById(id);
+  }
+
+
+
+  public RegistrationConfirmationToken findTokenByUser(Optional<User> user){
+    Optional <RegistrationConfirmationToken> token =  tokenRepo.findRegistrationConfirmationTokenByUser(user);
+
+    token.orElseThrow(RegistrationConfirmationTokenNotFoundException::new);
+
+    return token.map(RegistrationConfirmationToken::new).get();
   }
 }

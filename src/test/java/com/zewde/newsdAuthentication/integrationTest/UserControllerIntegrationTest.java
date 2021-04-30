@@ -66,7 +66,7 @@ public class UserControllerIntegrationTest {
 
   private void registrationSetupForLogin(User u) throws Exception {
       RegistrationConfirmationToken token =  userService.registerUserAndReturnToken(u);
-      userService.confirmUser(token);
+      userService.confirmUser(token.getToken());
   }
 
   @Test
@@ -170,8 +170,7 @@ public class UserControllerIntegrationTest {
 
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
-        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-        .andExpect(MockMvcResultMatchers.status().reason("Wrong username or password"));
+        .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
   }
 

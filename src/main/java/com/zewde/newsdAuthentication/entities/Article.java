@@ -15,6 +15,7 @@ public class Article implements Serializable {
   @Column(name="_id", unique=true)
   private String _id;
 
+  
   @Column(name="user_id")
   private int userId;
 

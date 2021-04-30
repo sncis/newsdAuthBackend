@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-//@Order(1)
 public class ApplicationEntryPointLoggingFilter extends OncePerRequestFilter {
   private final static Logger logger = LoggerFactory.getLogger(ApplicationEntryPointLoggingFilter.class);
 
@@ -22,12 +21,17 @@ public class ApplicationEntryPointLoggingFilter extends OncePerRequestFilter {
     String ipAddress = request.getRemoteAddr()  != null ? request.getRemoteAddr() : request.getHeader("X-FORWARDED-FOR");
     System.out.println("################ Initialising ApplicationEntryPointLoggingFilter ##################");
 
-    logger.info("Logging Request from ipAdresse: {}", ipAddress);
-    logger.info("For request method: {}   and path : {}", request.getMethod(), request.getContextPath());
-    logger.info("Request Length {} :  with contnet type {}", request.getContentLength(), request.getContentType());
 
+    logger.info("Logging Request from IpAddress: {}", ipAddress);
+    logger.info("For request method: {} and uri : {}", request.getMethod(), request.getRequestURI());
+
+    if(request.getContentLength() > 5000) {
+      logger.warn("Request rejected due to too long content! Content length : {} " ,request.getContentLength());
+      response.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,"To long content");
+    }
+
+    logger.info("Request Length {} :  with content type {}", request.getContentLength(), request.getContentType());
     System.out.println("################ End of LoggingFilter ##################");
-
     chain.doFilter(request, response);
   }
 

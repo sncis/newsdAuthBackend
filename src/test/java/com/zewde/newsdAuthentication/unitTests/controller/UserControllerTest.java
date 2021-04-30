@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.controller.UserController;
-import com.zewde.newsdAuthentication.service.EmailService;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
+import com.zewde.newsdAuthentication.service.EmailService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
@@ -20,19 +20,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
@@ -55,7 +54,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
 
-//
   @InjectMocks
   private UserController userController;
 
@@ -77,10 +75,11 @@ public class UserControllerTest {
   @Mock
   private SimpleMailMessage mail;
 
-  @Mock
-  private JavaMailSender mailSender;
 
   private MockMvc mockMvc;
+
+  private User user;
+  private String jsonUser;
 
 
   private String createUserJson(User u) throws JsonProcessingException {
@@ -106,16 +105,12 @@ public class UserControllerTest {
     mockMvc = MockMvcBuilders.standaloneSetup(userController)
         .build();
 
-//    mail = new SimpleMailMessage();
-//    when(mailSender.send(any(SimpleMailMessage.class))).thenAnwser();
+    user = createUser();
+    jsonUser = createUserJson(user);
 
   }
 
 
-//  mimeMessage = new MimeMessage((Session)null);
-//  javaMailSender = mock(JavaMailSender .class);
-//  when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
-//  emailServiceImpl = new EmailService(javaMailSender);
 
   @Test
   public void getRegister() throws Exception{
@@ -126,42 +121,54 @@ public class UserControllerTest {
 
   @Test
   public void postRegister() throws Exception {
-    User user = createUser();
-
-    String userJSON = createUserJson(user);
     RegistrationConfirmationToken token = new RegistrationConfirmationToken(user);
     when(userService.registerUserAndReturnToken(any(User.class))).thenReturn(token);
     when(mail.getText()).thenReturn("some tex");
 
     mockMvc.perform(post("/auth/register")
-        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(userJSON).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
 //        .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
   }
 
   @Test
+  public void resendConfirmationToken() throws Exception {
+    RegistrationConfirmationToken token = new RegistrationConfirmationToken(user);
+    when(userService.findTokenByUserEmail(any(String.class))).thenReturn(token);
+    when(mail.getText()).thenReturn("some tex");
+
+    mockMvc.perform(post("/auth/resendConfirmationToken").contentType(MediaType.APPLICATION_JSON_VALUE).content("email: email@some.de").with(csrf()))
+      .andExpect(MockMvcResultMatchers.status().isOk());
+
+  }
+
+  @Test
+  public void resendConfirmationTokeShouldThrowError_whenInvalidEmail() throws Exception {
+    when(userService.findTokenByUserEmail(any(String.class))).thenThrow(new UsernameNotFoundException("some error"));
+
+    mockMvc.perform(post("/auth/resendConfirmationToken").contentType(MediaType.APPLICATION_JSON_VALUE).content("email: email@some.de").with(csrf()))
+        .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+  }
+
+  @Test
   public void shouldThrowErrorWhenNoValidCredentials()throws Exception {
-    User user = new User();
-    user.setUsername("");
-    user.setPassword("somepass");
-    user.setEmail("");
-    String userJSON = createUserJson(user);
 
     mockMvc.perform(post("/auth/register")
-        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
-        .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
+        .andExpect(result ->assertTrue(result.getResolvedException() instanceof ResponseStatusException ));
   }
 
   @Test
   public void shouldThrowEmailAlreadyExistException_WhenUserTryToRegisterWithExistingEmail() throws Exception {
     when(userService.registerUserAndReturnToken(any(User.class))).thenThrow(new EmailAlreadyExistException());
 
-    User user = createUser();
-    String userJSON = createUserJson(user);
+//    User user = createUser();
+//    String userJSON = createUserJson(user);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
-        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Email already exists"))
         .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
@@ -172,11 +179,11 @@ public class UserControllerTest {
   public void shouldThrowUserNameAlreadyExistsException_WhenUsernameAlreadyExists() throws Exception{
     when(userService.registerUserAndReturnToken(any(User.class))).thenThrow(new UserNameAlreadyExistException());
 
-    User user = createUser();
-    String userJSON = createUserJson(user);
+//    User user = createUser();
+//    String userJSON = createUserJson(user);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
-        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJSON).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
         .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
@@ -185,18 +192,18 @@ public class UserControllerTest {
 
   @Test
   public void postLogin() throws Exception {
-    User u = createUser();
-    String json = createUserJson(u);
+//    User u = createUser();
+//    String json = createUserJson(u);
     Authentication auth = mock(Authentication.class);
     Cookie cookie = new Cookie("jwtToken", "some value");
 
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
-    when(userService.loginUser(any(User.class))).thenReturn(u);
+    when(userService.loginUser(any(User.class))).thenReturn(user);
     when(jwtTokenUtils.generateToken(any(String.class))).thenReturn("some token");
     when(cookiesUtils.createCookie(any(String.class), any(String.class))).thenReturn(cookie);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(json).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.cookie().exists("jwtToken"));
   }
@@ -205,7 +212,7 @@ public class UserControllerTest {
   @Test(expected = ResponseStatusException.class)
   public void shouldThrowBadCredentialsException_WhenCredentialsAreWrong(){
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Bad creds"));
-    User user = createUser();
+//    User user = createUser();
     MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
     userController.loginUser(user, mockResponse);

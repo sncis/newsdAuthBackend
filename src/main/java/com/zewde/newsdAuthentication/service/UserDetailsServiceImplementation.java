@@ -59,6 +59,12 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     return user.get().getId();
   }
 
+//  public User findUserByEmail(String email){
+//
+//
+//    return user.get();
+//  }
+
 
   public User loginUser(User u){
     return loadUserByUsername(u.getUsername());
@@ -77,7 +83,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     if(userRepository.findByUsername(u.getUsername()).isPresent()) {
       throw new UserNameAlreadyExistException();
 
-    }if(userRepository.findAllByEmail(u.getEmail()) != null){
+    }if(userRepository.findAllByEmail(u.getEmail()).isPresent()){
       throw new EmailAlreadyExistException();
     }
 
@@ -107,7 +113,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     if(userRepository.findByUsername(u.getUsername()).isPresent()) {
       throw new UserNameAlreadyExistException();
 
-    }if(userRepository.findAllByEmail(u.getEmail()) != null){
+    }if(userRepository.findAllByEmail(u.getEmail()).isPresent()){
       throw new EmailAlreadyExistException();
     }
 
@@ -131,13 +137,21 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     return registrationToken;
   }
 
-  public void confirmUser(RegistrationConfirmationToken token) {
-    User user = token.getUser();
-
+  public void confirmUser(String token) {
+    RegistrationConfirmationToken findUserToken = registrationTokenService.getToken(token);
+    User user = findUserToken.getUser();
     user.setEnabled(true);
-
     userRepository.save(user);
-    registrationTokenService.deleteToken(token.getId());
+    registrationTokenService.deleteToken(findUserToken.getId());
   }
 
+
+
+  public RegistrationConfirmationToken findTokenByUserEmail(String email){
+
+    Optional<User> user = userRepository.findUserByEmail(email);
+    user.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    return registrationTokenService.findTokenByUser(user);
+  }
 }

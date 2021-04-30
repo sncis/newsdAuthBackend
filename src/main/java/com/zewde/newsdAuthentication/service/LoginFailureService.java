@@ -16,7 +16,7 @@ public class LoginFailureService {
   @Autowired
   HttpServletRequest request;
 
-  private final int MAX_ATTEMP = 5;
+  private final int MAX_ATTEMPTS = 5;
   private LoadingCache<String, Integer> cachedAttempts;
 
 
@@ -48,7 +48,7 @@ public class LoginFailureService {
 
   public boolean isBlocked(String ipAddresse){
     try{
-      return cachedAttempts.get(ipAddresse) >= MAX_ATTEMP;
+      return cachedAttempts.get(ipAddresse) >= MAX_ATTEMPTS;
     }catch(ExecutionException e){
       return false;
     }

@@ -3,6 +3,7 @@ package com.zewde.newsdAuthentication.config;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -50,6 +51,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   SameSiteCookieFilter sameSiteCookieFilter;
 
+  @Value("${frontend.url}")
+  private String frontendUrl;
+
   @Bean
   @Override
   public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -91,7 +95,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .contentTypeOptions()
         .and().xssProtection()
         .and().cacheControl()
-        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' https://newsdme.herokuapp.com https://localhost:3000") //only permit resoruces from the same origine
+        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
         .and().frameOptions().sameOrigin().disable();
     //only allow secured requests
     //<---------- disable this following 3 lines if you don't want https locally -------------->
@@ -107,9 +111,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public CorsConfigurationSource corsConfigurationSource(){
+
+
+
+
     final CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOrigins(Arrays.asList("https://localhost:3000" ,"https://newsdme.herokuapp.com"));
+    config.setAllowedOrigins(Arrays.asList(frontendUrl));
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
         "GET", "POST", "DELETE", "OPTIONS"));
