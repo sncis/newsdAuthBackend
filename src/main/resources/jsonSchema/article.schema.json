@@ -24,10 +24,10 @@
     "clean_url" : {
       "description": "Url to source of an article",
       "type": "string",
-      "pattern": "^([A-Za-z0-9&_\\-#@!?()]{1,40})\\.([a-zA-Z]{2,4})$"
+      "pattern": "^([A-Za-z0-9&_\\-#!?%,\\-_]{1,40})\\.([a-zA-Z]{2,4})$"
     },
     "country" : {
-      "description": "Country in which the article was writte",
+      "description": "Country in which the article was write",
       "type": "string",
       "pattern": "^([A-Za-z]{2,4})$"
     },

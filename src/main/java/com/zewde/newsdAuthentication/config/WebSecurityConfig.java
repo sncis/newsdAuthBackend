@@ -48,8 +48,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
 
-  @Autowired
-  SameSiteCookieFilter sameSiteCookieFilter;
+//  @Autowired
+//  SameSiteCookieFilter sameSiteCookieFilter;
 
   @Value("${frontend.url}")
   private String frontendUrl;
@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(applicationEntryPointLoggingFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
-            .addFilterAfter(sameSiteCookieFilter, BasicAuthenticationFilter.class)
+//            .addFilterAfter(sameSiteCookieFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic().and()
