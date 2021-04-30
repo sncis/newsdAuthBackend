@@ -80,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
         .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
-            .antMatchers("/articles/admin").hasAuthority("ADMIN")
+            .antMatchers("/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
             .antMatchers("/auth/*", "/", "/favicon", "/error", "/favicon.ico").permitAll()
             .and().authorizeRequests().anyRequest().authenticated().and()
