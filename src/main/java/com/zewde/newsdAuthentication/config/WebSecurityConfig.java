@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -47,10 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
-
-//  @Autowired
-//  SameSiteCookieFilter sameSiteCookieFilter;
-
+  
   @Value("${frontend.url}")
   private String frontendUrl;
 
@@ -66,6 +64,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
 
+  @Bean
+  public AccessDeniedHandler customAccessDeniedHandler(){
+    return new CustomAccessDeniedHandler();
+  }
   @Override
   public void configure(AuthenticationManagerBuilder auth) throws Exception{
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
@@ -87,7 +89,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(applicationEntryPointLoggingFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
-//            .addFilterAfter(sameSiteCookieFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic().and()

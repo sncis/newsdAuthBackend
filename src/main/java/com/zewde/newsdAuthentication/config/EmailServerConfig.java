@@ -54,8 +54,6 @@ public class EmailServerConfig {
     message.setText("Hi from Newsdme \n please click the link below to confirm your registration.\n\n\n\n" +
         frontendUrl+"/confirm/2?token=%s\n");
 
-//        "https://newsdme.herokuapp.com/confirm/2&token=%s\n");
-
     return message;
   }
 

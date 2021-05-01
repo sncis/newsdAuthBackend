@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
   public class ErrorController {
     @RequestMapping("/error")
     public String name(Throwable e) {
-      return "api error";
+      return "some error occured";
     }
   }

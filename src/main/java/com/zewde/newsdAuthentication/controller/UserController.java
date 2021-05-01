@@ -2,8 +2,6 @@ package com.zewde.newsdAuthentication.controller;
 
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
-import com.zewde.newsdAuthentication.Exceptions.RegistrationConfirmationTokenNotFoundException;
-import com.zewde.newsdAuthentication.Exceptions.UserLoginBlockedException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
@@ -23,7 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -102,55 +100,24 @@ public class UserController {
   @PostMapping("/login")
   public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response) throws BadCredentialsException, DisabledException{
 
-    try{
-      authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
-      User u = userService.loginUser(user);
-    }catch(BadCredentialsException e){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password", e);
-    }catch(DisabledException e){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is disabled. Please check your email's for Confirmation token", e);
-    }catch(UsernameNotFoundException e){
-      System.out.println(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such username, please register", e);
-    }catch(UserLoginBlockedException e ){
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "we locked you account because of to many attempts",e);
-    }catch(Exception e ){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry, some unexpected Error occurred!", e);
-    }
-
-    User u = userService.loginUser(user);
-    String token = jwtTokenUtils.generateToken(u.getUsername());
-
+    Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
+    String token = jwtTokenUtils.generateToken(auth.getName());
     Cookie cookie = cookiesUtils.createCookie("jwtToken", token);
-    System.out.println(cookie);
     response.addCookie(cookie);
-    return new ResponseEntity<>("successfully logged in",HttpStatus.OK);
+
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 
   @GetMapping("/confirm")
   public ResponseEntity<?> confirmUser(@Valid @RequestParam("token") String token){
-    try{
-//      RegistrationConfirmationToken confirmToken = registrationConfirmationTokenService.getToken(token);
-//      System.out.println(confirmToken);
-      userService.confirmUser(token);
-
-    }catch(RegistrationConfirmationTokenNotFoundException ex){
-
-      throw  new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
-
-    return new ResponseEntity<>("registration confirmation successful",HttpStatus.OK);
+    userService.confirmUser(token);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/resendConfirmationToken")
   public ResponseEntity<?> resendConfirmationToken(@Valid @RequestBody String email){
-    RegistrationConfirmationToken token;
-    try{
-      token = userService.findTokenByUserEmail(email);
-    }catch(UsernameNotFoundException e){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no such user");
-    }
+    RegistrationConfirmationToken token = userService.findTokenByUserEmail(email);
 
     String textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token.getToken());
     emailService.sendEmail(email,"Confirm newsdMe registration", textMail);

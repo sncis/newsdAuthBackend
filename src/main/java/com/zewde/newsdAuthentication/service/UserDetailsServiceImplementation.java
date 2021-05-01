@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
+//import com.zewde.newsdAuthentication.Exceptions.UserLoginBlockedException;
+
 @Service
 @Transactional
 public class UserDetailsServiceImplementation implements UserDetailsService {
@@ -37,19 +39,22 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   private LoginFailureService loginFailureService;
 
 
+
   @Override
   public User loadUserByUsername(String username){
 
     String ipAddress = loginFailureService.getIpAddress();
+
     if(loginFailureService.isBlocked(ipAddress)){
-      throw new UserLoginBlockedException("user is blocked");
+      throw new UserLoginBlockedException();
     }
+      Optional<User> user = userRepository.findByUsername(username);
+      user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
-    Optional<User> user = userRepository.findByUsername(username);
+      return user.map(User::new).get();
 
-    user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
-    return user.map(User::new).get();
   }
+
 
   public int findUserIdByUsername(String username){
     Optional<User> user = userRepository.findByUsername(username);
@@ -57,17 +62,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
     return user.get().getId();
-  }
-
-//  public User findUserByEmail(String email){
-//
-//
-//    return user.get();
-//  }
-
-
-  public User loginUser(User u){
-    return loadUserByUsername(u.getUsername());
   }
 
 
@@ -78,33 +72,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
      return user.map(User::new).get();
   }
 
-  public User registerUser(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {
-
-    if(userRepository.findByUsername(u.getUsername()).isPresent()) {
-      throw new UserNameAlreadyExistException();
-
-    }if(userRepository.findAllByEmail(u.getEmail()).isPresent()){
-      throw new EmailAlreadyExistException();
-    }
-
-    User newUser = new User();
-    newUser.setEmail(u.getEmail());
-    newUser.setPassword(passwordEncoder.encode(u.getPassword()));
-    newUser.setUsername(u.getUsername());
-    newUser.setActive(true);
-
-    try{
-      userRepository.save(newUser);
-      RegistrationConfirmationToken registrationToken = new RegistrationConfirmationToken(newUser);
-      System.out.println("registration user in registration ");
-      System.out.println(registrationToken);
-
-      registrationTokenRepo.save(registrationToken);
-    }catch(Exception e){
-      System.out.println(e.getMessage());
-    }
-    return newUser;
-  }
 
 
   public RegistrationConfirmationToken registerUserAndReturnToken(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {
@@ -113,7 +80,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     if(userRepository.findByUsername(u.getUsername()).isPresent()) {
       throw new UserNameAlreadyExistException();
 
-    }if(userRepository.findAllByEmail(u.getEmail()).isPresent()){
+    }else if(userRepository.findAllByEmail(u.getEmail()).isPresent()){
       throw new EmailAlreadyExistException();
     }
 
@@ -137,12 +104,14 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     return registrationToken;
   }
 
+
   public void confirmUser(String token) {
-    RegistrationConfirmationToken findUserToken = registrationTokenService.getToken(token);
-    User user = findUserToken.getUser();
+
+    RegistrationConfirmationToken userToken = registrationTokenService.getToken(token);
+    User user = userToken.getUser();
     user.setEnabled(true);
     userRepository.save(user);
-    registrationTokenService.deleteToken(findUserToken.getId());
+    registrationTokenService.deleteToken(userToken.getId());
   }
 
 
