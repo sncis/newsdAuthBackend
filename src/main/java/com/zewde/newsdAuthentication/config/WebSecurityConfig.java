@@ -13,10 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -48,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
-  
+
   @Value("${frontend.url}")
   private String frontendUrl;
 
@@ -64,10 +62,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
 
-  @Bean
-  public AccessDeniedHandler customAccessDeniedHandler(){
-    return new CustomAccessDeniedHandler();
-  }
   @Override
   public void configure(AuthenticationManagerBuilder auth) throws Exception{
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
@@ -80,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configure(HttpSecurity http) throws Exception{
 
         http.cors().and().csrf().disable()
-        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+//        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
             .antMatchers("/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
