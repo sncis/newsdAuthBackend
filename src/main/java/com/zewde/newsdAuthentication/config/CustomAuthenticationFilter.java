@@ -93,7 +93,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException {
     String path = request.getRequestURI();
 
-    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/resendConfirmationToken","/","/logout", "/error", "/favicon", "/favicon.ico");
+    List<String> urls = Arrays.asList("/auth/register","/auth/login","/auth/confirm","/auth/resendConfirmationToken","/","/logout", "/error", "/favicon", "/favicon.ico","/auth/confirm*");
 
     logger.info("Url should be filtered " + urls.contains(path));
     return urls.contains(path);
