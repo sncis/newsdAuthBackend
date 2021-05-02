@@ -18,8 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +60,7 @@ public class UserController {
   @Autowired
   private EmailService emailService;
 
-  @GetMapping("/register")
+  @GetMapping(value={"/","/register"})
   public @ResponseBody String getRegister(){
     return "please register";
   }
@@ -98,7 +96,7 @@ public class UserController {
 
 
   @PostMapping("/login")
-  public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response) throws BadCredentialsException, DisabledException{
+  public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response){
 
     Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
     String token = jwtTokenUtils.generateToken(auth.getName());

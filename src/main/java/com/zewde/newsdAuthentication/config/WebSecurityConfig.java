@@ -86,13 +86,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-           .and().httpBasic().and()
-        .headers()
-        .contentTypeOptions()
-        .and().xssProtection()
-        .and().cacheControl()
-        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
-        .and().frameOptions().sameOrigin().disable();
+           .and().httpBasic();
+//        .headers()
+//        .contentTypeOptions()
+//        .and().xssProtection()
+//        .and().cacheControl()
+//        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
+//        .and().frameOptions().sameOrigin().disable();
     //only allow secured requests
     //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()

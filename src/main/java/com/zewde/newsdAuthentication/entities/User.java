@@ -60,7 +60,6 @@ public class User implements UserDetails {
 
   @JsonDeserialize(as = GrantedAuthority.class)
   @JsonIgnore
-//  @JsonProperty("authorities")
   @Transient
   private List<GrantedAuthority> authorities = new ArrayList<>();
 
