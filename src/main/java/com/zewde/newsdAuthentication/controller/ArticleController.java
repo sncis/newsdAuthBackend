@@ -35,6 +35,12 @@ public class ArticleController {
   @Autowired
   JWTTokenUtils jwtTokenUtils;
 
+  @GetMapping("/")
+  public ResponseEntity getHello(){
+    return new ResponseEntity<>("Hello from newsdMe", HttpStatus.OK);
+  }
+
+
   @GetMapping("/articles")
   public ResponseEntity<?> getArticlesPerUser(Principal principal){
     ArrayList<Article> articles;

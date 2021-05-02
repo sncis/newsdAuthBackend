@@ -60,7 +60,7 @@ public class UserController {
   @Autowired
   private EmailService emailService;
 
-  @GetMapping(value={"/","/register"})
+  @GetMapping("/register")
   public @ResponseBody String getRegister(){
     return "please register";
   }
