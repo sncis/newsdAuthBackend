@@ -225,7 +225,7 @@ public class UserControllerTest {
 
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf())).andDo(print())
-        .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+        .andExpect(MockMvcResultMatchers.status().isForbidden())
         .andExpect(result -> assertEquals(result.getResponse().getContentAsString(),"Your account is disabled."));
   }
 

@@ -86,7 +86,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-           .and().httpBasic();
+           .and().httpBasic().and()
+         .headers()
+       .contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
+        .and().frameOptions().sameOrigin().disable();
 //        .headers()
 //        .contentTypeOptions()
 //        .and().xssProtection()
