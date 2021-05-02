@@ -87,7 +87,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic();
-//         .headers()
+         http.headers()
+            .contentSecurityPolicy("script-src 'self'");
+
 //       .contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
 //        .and().frameOptions().sameOrigin().disable();
 //        .headers()
@@ -119,10 +121,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "Accept",
         "Cache-Control",
         "Content-Type",
-        "Access-Control-Allow-*",
-//        "Access-Control-Allow-Headers",
-//        "Access-Control-Allow-Credentials",
-//        "Access-Control-Allow-Methods",
+        "Access-Control-Allow-Origins",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Credentials",
+        "Access-Control-Allow-Methods",
         "x-frame-options",
         "x-xsrf-token",
         "Strict-Transport-Security",
