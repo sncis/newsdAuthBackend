@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -66,10 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configure(AuthenticationManagerBuilder auth) throws Exception{
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
   }
-
-
-
-
+  
   @Override
   public void configure(HttpSecurity http) throws Exception{
 
@@ -89,8 +87,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
            .and().httpBasic();
          http.headers()
             .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
-             .policyDirectives("camera 'none'; autoplay 'none'; fullscreen 'self'; geolocation 'self'; gyroscope 'self';  magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; publickey-credentials-get 'none'; sync-xhr 'self'; usb 'none'; xr-spatial-tracking 'none' ");
-    
+             .and().addHeaderWriter(new StaticHeadersWriter("Permissions-Policy", "camera 'none'; autoplay 'none'; fullscreen 'self'; geolocation 'self'; gyroscope 'self';  magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; publickey-credentials-get 'none'; sync-xhr 'self'; usb 'none'; xr-spatial-tracking 'none' "))
+             .addHeaderWriter(new StaticHeadersWriter( "Referrer-Policy", "strict-origin-when-cross-origin"));
+
+
+
 //       .contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
 //        .and().frameOptions().sameOrigin().disable();
 //        .headers()
