@@ -1,6 +1,6 @@
 # newsdAuthentication
 
-> For convenience, I have left this repository private so that I can populate some credentials.
+> For convenience, I have created some test accounts and users credentials which can be used to test the app.
 > This was on purpose to make it simple and to give you the possibility to use the whole functionalities without creating own mail account, API Key etc.    
 
 newsdAuthentication is a simple REST API for authenticating users and retrieving stored Articles from these users. It serves as Backend Service for the NewsdMe app.
