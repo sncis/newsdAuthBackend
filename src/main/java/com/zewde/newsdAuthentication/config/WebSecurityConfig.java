@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
            .and().httpBasic();
          http.headers()
             .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
-             .and().addHeaderWriter(new StaticHeadersWriter("Permissions-Policy", "camera=(none), autoplay= (none),fullscreen=(self),geolocation=(self),gyroscope=(self),magnetometer=(self),microphone=(none),payment=(none),picture-in-picture=(none),publickey-credentials-get=(none),sync-xhr=(self), usb=(none),xr-spatial-tracking=(none)"))
+             .and().addHeaderWriter(new StaticHeadersWriter("Permissions-Policy", "camera=('none'), autoplay= ('none'),fullscreen=('self'),geolocation=('self'),gyroscope=('self'),magnetometer=('self'),microphone=('none'),payment=('none'),picture-in-picture=('none'),publickey-credentials-get=('none'),sync-xhr=('self'), usb=('none'),xr-spatial-tracking=('none')"))
              .addHeaderWriter(new StaticHeadersWriter( "Referrer-Policy", "strict-origin-when-cross-origin"));
 
 
