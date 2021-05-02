@@ -88,8 +88,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic();
          http.headers()
-            .contentSecurityPolicy("script-src 'self'");
-
+            .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
+             .policyDirectives("camera 'none'; autoplay 'none'; fullscreen 'self'; geolocation 'self'; gyroscope 'self';  magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; publickey-credentials-get 'none'; sync-xhr 'self'; usb 'none'; xr-spatial-tracking 'none' ");
+    
 //       .contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
 //        .and().frameOptions().sameOrigin().disable();
 //        .headers()
