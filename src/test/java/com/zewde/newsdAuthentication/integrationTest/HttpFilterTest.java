@@ -24,6 +24,7 @@ public class HttpFilterTest {
 
   @Test
   public void shouldReturnDefaultMessage() throws Exception {
+
     this.mockMvc.perform(get("/auth/register")).andDo(print()).andExpect(status().isOk())
 //        .andExpect(content().string(containsString("Hello, World")));
             .andExpect(content().string(containsString("please register")));
