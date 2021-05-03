@@ -15,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -69,12 +68,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsServiceImplementation).passwordEncoder(passwordEncoder);
   }
 
+
   @Override
   public void configure(HttpSecurity http) throws Exception{
 
         http.cors()
 //            .and().csrf().disable()
-        .and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+        .and().csrf().csrfTokenRepository(MyCsrfTokenRepository.withHttpOnlyFalse()).and()
         .authorizeRequests()
             .antMatchers("/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
@@ -86,6 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic();
+//    http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
 
     http.headers()
         .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
@@ -119,8 +120,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "Access-Control-Allow-Headers",
         "Access-Control-Allow-Credentials",
         "Access-Control-Allow-Methods",
-        "x-frame-options",
-        "x-xsrf-token",
+        "X-Frame-options",
+        "X-XSRF-TOKEN",
+        "X-CSRF-TOKEN",
         "Strict-Transport-Security",
         "Content-Security-Policy",
         "X-Content-Type-Options",
