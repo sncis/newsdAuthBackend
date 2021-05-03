@@ -32,7 +32,6 @@ public class EmailService {
     message.setSubject(subject);
     message.setText(text);
 
-    System.out.println("************************");
     logger.info("Mail created");
    try {
      mailSender.send(message);

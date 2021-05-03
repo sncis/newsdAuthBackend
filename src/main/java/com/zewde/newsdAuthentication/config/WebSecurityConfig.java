@@ -85,22 +85,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic();
-         http.headers()
-            .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
-             .and().addHeaderWriter(new StaticHeadersWriter("Features-Policy", "camera 'none'; autoplay 'none'; fullscreen 'self'; geolocation 'self'; gyroscope 'self';  magnetometer 'self'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; publickey-credentials-get 'none'; sync-xhr 'self'; usb 'none'; xr-spatial-tracking 'none'"))
-             .addHeaderWriter(new StaticHeadersWriter( "Referrer-Policy", "strict-origin-when-cross-origin"));
 
+    http.headers()
+        .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
+        .and().addHeaderWriter(new StaticHeadersWriter("Features-Policy", "camera 'none'; autoplay 'none'; fullscreen 'self'; geolocation 'self'; gyroscope 'self';  magnetometer 'self'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; publickey-credentials-get 'none'; sync-xhr 'self'; usb 'none'; xr-spatial-tracking 'none'"))
+        .addHeaderWriter(new StaticHeadersWriter( "Referrer-Policy", "strict-origin-when-cross-origin"));
 
+    // Allow only secure request and forward http requests to https
 
-//       .contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
-//        .and().frameOptions().sameOrigin().disable();
-//        .headers()
-//        .contentTypeOptions()
-//        .and().xssProtection()
-//        .and().cacheControl()
-//        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
-//        .and().frameOptions().sameOrigin().disable();
-    //only allow secured requests
     //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)

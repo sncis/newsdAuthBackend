@@ -124,11 +124,21 @@ http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
         .requiresSecure();
  ```
-  
-  
+
+### Adding a Database Connection
+To run the app locally, you would nee to connect a local Database. You could either connect to your own local Database by editing\n
+the connection details in the `application-dev.properties` file or use the credentials form the `application-test.properties` file:
+
+lines to change:
+
+```$xslt
+spring.datasource.url= <uri to DB>
+spring.datasource.username= <username>
+spring.datasource.password= <password if existing>
+
+```
   
 ### Running newsdAuthentication locally
-\
 To build the application with `maven` navigate to the root application folder and run:
 
 ``` 
