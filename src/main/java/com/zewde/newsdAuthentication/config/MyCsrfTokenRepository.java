@@ -1,5 +1,7 @@
 package com.zewde.newsdAuthentication.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.DefaultCsrfToken;
@@ -26,8 +28,12 @@ public class MyCsrfTokenRepository implements CsrfTokenRepository {
   private String cookieDomain;
   private Boolean secure;
 
+  private final static Logger logger = LoggerFactory.getLogger(MyCsrfTokenRepository.class);
+
+
   public MyCsrfTokenRepository() {
   }
+
 
   public CsrfToken generateToken(HttpServletRequest request) {
     return new DefaultCsrfToken(this.headerName, this.parameterName, this.createNewToken());
@@ -36,20 +42,30 @@ public class MyCsrfTokenRepository implements CsrfTokenRepository {
   public void saveToken(CsrfToken token, HttpServletRequest request, HttpServletResponse response) {
     String tokenValue = token != null ? token.getToken() : "";
     Cookie cookie = new Cookie(this.cookieName, tokenValue);
-    cookie.setSecure(this.secure != null ? this.secure : request.isSecure());
+    logger.info("***************************CSRF Repo*********");
+//    cookie.setSecure(this.secure != null ? this.secure : request.isSecure());
     cookie.setPath(StringUtils.hasLength(this.cookiePath) ? this.cookiePath : this.getRequestContext(request));
     cookie.setMaxAge(token != null ? -1 : 0);
-    cookie.setHttpOnly(this.cookieHttpOnly);
+//    cookie.setHttpOnly(this.cookieHttpOnly);
     if (StringUtils.hasLength(this.cookieDomain)) {
       cookie.setDomain(this.cookieDomain);
     }
 
+    logger.info("cookie name: {}", cookie.getName());
+    logger.info("cookie value: {}", cookie.getValue());
+
+    response.addHeader("XSRF-TOKEN",cookie.getValue());
     response.addCookie(cookie);
   }
 
   public CsrfToken loadToken(HttpServletRequest request) {
     Cookie cookie = WebUtils.getCookie(request, this.cookieName);
     String token = request.getHeader("X-XSRF-TOKEN");
+    logger.info("*************load method      \n");
+    logger.info("cookie name: {}", cookie.getName());
+    logger.info("cookie value: {}", cookie.getValue());
+    logger.info("token: {}", token);
+
     if (token == null) {
       return null;
     } else {

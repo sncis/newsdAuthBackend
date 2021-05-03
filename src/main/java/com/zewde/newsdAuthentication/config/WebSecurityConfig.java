@@ -111,6 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
         "GET", "POST", "DELETE", "OPTIONS"));
+    config.setExposedHeaders(Arrays.asList("XSRF-TOKEN","X-XSRF-TOKEN","Set-Cookie"));
     config.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Accept",
@@ -122,7 +123,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "Access-Control-Allow-Methods",
         "X-Frame-options",
         "X-XSRF-TOKEN",
-        "X-CSRF-TOKEN",
         "Strict-Transport-Security",
         "Content-Security-Policy",
         "X-Content-Type-Options",
