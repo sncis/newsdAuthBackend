@@ -43,7 +43,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   @Override
   public User loadUserByUsername(String username)throws UsernameNotFoundException, UserLoginBlockedException{
 
-
     String ipAddress = loginFailureService.getIpAddress();
 
     if(loginFailureService.isBlocked(ipAddress)){

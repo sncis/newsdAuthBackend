@@ -92,7 +92,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .addHeaderWriter(new StaticHeadersWriter( "Referrer-Policy", "strict-origin-when-cross-origin"));
 
     // Allow only secure request and forward http requests to https
-
     //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
