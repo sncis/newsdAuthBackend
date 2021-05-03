@@ -21,17 +21,6 @@ public class ApplicationEntryPointLoggingFilter extends OncePerRequestFilter {
     String ipAddress = request.getRemoteAddr()  != null ? request.getRemoteAddr() : request.getHeader("X-FORWARDED-FOR");
     System.out.println("################ Initialising ApplicationEntryPointLoggingFilter ##################");
 
-    logger.info("csrf token ");
-    logger.info("xsrf token with x : {}", request.getHeader("X-XSRF-TOKEN"));
-    logger.info("xsrf token with x : {}", request.getHeader("X-XSRF-TOKEN"));
-
-
-    logger.info("******************");
-    logger.info("******************");
-    logger.info("******************");
-    logger.info("******************");
-    logger.info("******************");
-
     logger.info("Logging Request from IpAddress: {}", ipAddress);
     logger.info("For request method: {} and uri : {}", request.getMethod(), request.getRequestURI());
 

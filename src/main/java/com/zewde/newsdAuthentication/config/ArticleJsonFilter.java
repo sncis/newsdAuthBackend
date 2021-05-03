@@ -45,11 +45,6 @@ public class ArticleJsonFilter extends OncePerRequestFilter {
       om.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
       JsonNode jsonNode = om.readTree(cachedArticleRequest.getInputStream());
 
-      System.out.println("*********************************");
-      System.out.println("articles in json form from request body");
-      System.out.println(jsonNode);
-
-
       Set<ValidationMessage> errors = schema.validate(jsonNode);
       StringBuilder errorsCombined = new StringBuilder();
 
