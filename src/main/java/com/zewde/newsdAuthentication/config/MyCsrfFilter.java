@@ -35,6 +35,17 @@ public class MyCsrfFilter extends OncePerRequestFilter {
       System.out.println("***********************************************");
       System.out.println("***********************************************");
       System.out.println("csrf token value    "+csrfTokenValue);
+      System.out.println("csrf token cookie    "+cookies);
+
+
+
+        for (Cookie cookie : cookies) {
+          if (cookie.getName().equals(CSRF_TOKEN)) {
+            String csrfCookieValue = cookie.getValue();
+            System.out.println("csrf token cookie value  in cookie"+csrfCookieValue);
+
+          }
+        }
 
       String csrfCookieValue = null;
       if (cookies != null) {
