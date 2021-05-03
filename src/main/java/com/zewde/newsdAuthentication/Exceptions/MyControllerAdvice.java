@@ -31,7 +31,7 @@ public class MyControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(DisabledException.class)
   public ResponseEntity<String> accountDisabled(DisabledException accountDisabled){
-    return new ResponseEntity<>("Your account is disabled.", HttpStatus.UNAUTHORIZED);
+    return new ResponseEntity<>("Your account is disabled.", HttpStatus.FORBIDDEN);
   }
 
 

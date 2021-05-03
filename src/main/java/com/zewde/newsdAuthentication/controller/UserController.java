@@ -69,7 +69,6 @@ public class UserController {
 
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException, IOException, MessagingException {
-//    User u;
     RegistrationConfirmationToken token;
     String textMail;
 

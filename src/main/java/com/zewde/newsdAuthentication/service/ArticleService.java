@@ -32,25 +32,17 @@ public class ArticleService {
     try{
       userId = userService.createUserByUsername(userName).getId();
       articles = articleRepository.findAllByUserId(userId);
-      System.out.println("*******************");
-      System.out.println(articles);
+
     }catch(UsernameNotFoundException e){
       throw new UsernameNotFoundException("no such user");
     }catch(Exception e){
       System.out.println(e.getMessage());
     }
-
-    System.out.println(articles);
-
     return articles;
-
   }
 
-
   public boolean deleteUnbookmarkedArticle(String articleId) throws ArticleNotFoundException{
-
     try {
-//      articleRepository.deleteArticleByTitle(title);
       articleRepository.deleteBy_id(articleId);
       return true;
     } catch(EmptyResultDataAccessException e) {
@@ -63,12 +55,7 @@ public class ArticleService {
     try{
       return articleRepository.saveAndFlush(article);
     }catch(Exception e){
-      System.out.println("**************************************");
-      System.out.println("**************************************");
-      System.out.println("**************************************");
-      System.out.println("**************************************");
-      System.out.println("**************************************");
-      System.out.println(e.getCause());
+
       System.out.println(e.getMessage());
 
       throw new DataBaseException(e.getMessage());

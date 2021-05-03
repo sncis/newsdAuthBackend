@@ -41,7 +41,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
 
   @Override
-  public User loadUserByUsername(String username){
+  public User loadUserByUsername(String username)throws UsernameNotFoundException, UserLoginBlockedException{
 
     String ipAddress = loginFailureService.getIpAddress();
 
@@ -56,7 +56,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   }
 
 
-  public int findUserIdByUsername(String username){
+  public int findUserIdByUsername(String username) throws UsernameNotFoundException{
     Optional<User> user = userRepository.findByUsername(username);
 
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
@@ -65,7 +65,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   }
 
 
-  public User createUserByUsername(String username){
+  public User createUserByUsername(String username) throws UsernameNotFoundException{
     Optional<User> user = userRepository.findByUsername(username);
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 

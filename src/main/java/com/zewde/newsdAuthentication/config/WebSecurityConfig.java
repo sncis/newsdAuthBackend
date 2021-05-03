@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -86,14 +87,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-           .and().httpBasic().and()
-        .headers()
-        .contentTypeOptions()
-        .and().xssProtection()
-        .and().cacheControl()
-        .and().httpStrictTransportSecurity().and().contentSecurityPolicy("default-src 'self' "+ frontendUrl) //only permit resoruces from the same origine
-        .and().frameOptions().sameOrigin().disable();
-    //only allow secured requests
+           .and().httpBasic();
+    http.headers()
+        .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
+        .and().addHeaderWriter(new StaticHeadersWriter("Features-Policy", "camera 'none'; autoplay 'none'; fullscreen 'self'; geolocation 'self'; gyroscope 'self';  magnetometer 'self'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; publickey-credentials-get 'none'; sync-xhr 'self'; usb 'none'; xr-spatial-tracking 'none'"))
+        .addHeaderWriter(new StaticHeadersWriter( "Referrer-Policy", "strict-origin-when-cross-origin"));
+
+    // Allow only secure request and forward http requests to https
     //<---------- disable this following 3 lines if you don't want https locally -------------->
     http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
@@ -116,10 +116,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "Accept",
         "Cache-Control",
         "Content-Type",
-        "Access-Control-Allow-*",
-//        "Access-Control-Allow-Headers",
-//        "Access-Control-Allow-Credentials",
-//        "Access-Control-Allow-Methods",
+        "Access-Control-Allow-Origins",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Credentials",
+        "Access-Control-Allow-Methods",
         "x-frame-options",
         "x-xsrf-token",
         "Strict-Transport-Security",
