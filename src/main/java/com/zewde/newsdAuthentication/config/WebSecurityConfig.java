@@ -15,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -74,9 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configure(HttpSecurity http) throws Exception{
 
         http.cors()
-            .and().csrf().disable().addFilterBefore(
-            new MyCsrfFilter(), CsrfFilter.class)
-//        .and().csrf().csrfTokenRepository(MyCsrfTokenRepository.withHttpOnlyFalse()).and()
+            .and().csrf().disable()
         .authorizeRequests()
             .antMatchers("/admin").hasAuthority("ADMIN")
             .antMatchers("/articles/*").hasAnyAuthority("USER","ADMIN")
@@ -88,7 +85,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic();
-//    http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
 
     http.headers()
         .contentSecurityPolicy("default-src 'self' " + frontendUrl+ "; connect-src 'self' https://newsdme.herokuapp.com/ " + frontendUrl+ " ; img-src 'self'; script-src 'self' " + frontendUrl+ "; style-src 'self';  manifest-src 'self' " + frontendUrl)
@@ -100,8 +96,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.requiresChannel()
         .requestMatchers(matcher -> matcher.getHeader("X-Forwarded-Proto") !=null)
         .requiresSecure();
-
-
   }
 
   @Bean
@@ -113,7 +107,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     config.setAllowCredentials(true);
     config.setAllowedMethods(Arrays.asList("HEAD",
         "GET", "POST", "DELETE", "OPTIONS"));
-    config.setExposedHeaders(Arrays.asList("XSRF-TOKEN","X-CSRF-TOKEN","X-XSRF-TOKEN","Set-Cookie"));
     config.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Accept",
@@ -124,8 +117,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "Access-Control-Allow-Credentials",
         "Access-Control-Allow-Methods",
         "X-Frame-options",
-        "X-XSRF-TOKEN",
-        "X-CSRF-TOKEN",
         "Strict-Transport-Security",
         "Content-Security-Policy",
         "X-Content-Type-Options",
