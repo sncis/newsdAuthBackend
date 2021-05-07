@@ -26,7 +26,6 @@ public class MyControllerAdvice extends ResponseEntityExceptionHandler {
   @ExceptionHandler(UserLoginBlockedException.class)
   public ResponseEntity<String> userLoginBlockedException(UserLoginBlockedException userLoginBlockedException){
     return new ResponseEntity<>("Your account is blocked due to too many failed login attempts. You can try it again in 5 minutes", HttpStatus.TOO_MANY_REQUESTS);
-
   }
 
   @ExceptionHandler(DisabledException.class)
@@ -35,17 +34,24 @@ public class MyControllerAdvice extends ResponseEntityExceptionHandler {
   }
 
 
-  @ExceptionHandler(RegistrationConfirmationTokenNotFoundException .class)
-  public ResponseEntity<String> registrationConfirmationTokenNot(RegistrationConfirmationTokenNotFoundException  accountDisabled){
-    return new ResponseEntity<>("Your account is disabled. Please confirm your Registration.", HttpStatus.BAD_REQUEST);
-  }
-
   @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<String> accessdenied(AccessDeniedException ex){
+  public ResponseEntity<String> accessDenied(AccessDeniedException ex){
     return new ResponseEntity<>("Sorry you are not allowed to access these resource", HttpStatus.FORBIDDEN);
-
   }
-//
 
+  @ExceptionHandler(RegistrationConfirmationTokenNotFoundException.class)
+  public ResponseEntity<String> registrationTokenException(RegistrationConfirmationTokenNotFoundException ex){
+    return new ResponseEntity<>("No registration token found. Please Login or Register", HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(ArticleNotFoundException.class)
+  public ResponseEntity<String> noArticleException(ArticleNotFoundException noArticleException){
+    return new ResponseEntity<>("Sorry, their is no such article.", HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(DataBaseException.class)
+  public ResponseEntity<String> dataBaseException(DataBaseException dataBaseException){
+    return new ResponseEntity<>("Sorry, something went wrong.", HttpStatus.NOT_FOUND);
+  }
 
 }

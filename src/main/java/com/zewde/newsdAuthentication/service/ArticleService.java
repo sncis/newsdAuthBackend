@@ -6,7 +6,6 @@ import com.zewde.newsdAuthentication.entities.Article;
 import com.zewde.newsdAuthentication.repositories.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,22 +28,22 @@ public class ArticleService {
     int userId;
     ArrayList<Article> articles = null;
 
-    try{
+//    try{
       userId = userService.createUserByUsername(userName).getId();
       articles = articleRepository.findAllByUserId(userId);
-
-    }catch(UsernameNotFoundException e){
-      throw new UsernameNotFoundException("no such user");
-    }catch(Exception e){
-      System.out.println(e.getMessage());
-    }
+//
+//    }catch(
+//  UsernameNotFoundException e){
+//      throw new UsernameNotFoundException("no such user");
+//    }catch(Exception e){
+//      System.out.println(e.getMessage());
+//    }
     return articles;
   }
 
-  public boolean deleteUnbookmarkedArticle(String articleId) throws ArticleNotFoundException{
+  public void deleteUnbookmarkedArticle(String articleId) throws ArticleNotFoundException{
     try {
       articleRepository.deleteBy_id(articleId);
-      return true;
     } catch(EmptyResultDataAccessException e) {
       throw new ArticleNotFoundException("No such article");
     }
@@ -55,8 +54,6 @@ public class ArticleService {
     try{
       return articleRepository.saveAndFlush(article);
     }catch(Exception e){
-
-      System.out.println(e.getMessage());
 
       throw new DataBaseException(e.getMessage());
     }

@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -72,12 +71,6 @@ public class ArticleServiceTest {
 
   }
 
-  @Test
-  public void deleteUnbookmarkedArticles() {
-    doNothing().when(articleRepository).deleteBy_id(anyString());
-    boolean isDeleted = articleService.deleteUnbookmarkedArticle("1");
-    assertTrue(isDeleted);
-  }
 
   @Test(expected = ArticleNotFoundException.class)
   public void shouldThrowArticleNotFoundException_WhenDeleteUnbookmarkedArticles() {

@@ -2,6 +2,8 @@ package com.zewde.newsdAuthentication.integrationTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
+import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
@@ -11,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -64,7 +66,7 @@ public class UserControllerIntegrationTest {
   }
 
 
-  private void registrationSetupForLogin(User u) throws Exception {
+  private void registrationSetupForLogin(User u) {
       RegistrationConfirmationToken token =  userService.registerUserAndReturnToken(u);
       userService.confirmUser(token.getToken());
   }
@@ -83,8 +85,6 @@ public class UserControllerIntegrationTest {
 
     String userJSON = createUserJson(user);
 
-//    when(userService.registerUser(any(User.class))).thenReturn();
-
     mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(userJSON).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -93,18 +93,14 @@ public class UserControllerIntegrationTest {
   @Test
   public void registerShouldFail_WhenInvalidCredentials() throws Exception {
     User user = createUser("stesds","somepas","some@email.com");
-//    user.setUsername("someUserName");
-//    user.setPassword("somepas");
-//    user.setEmail("some@email.com");
 
     String userJson = createUserJson(user);
 
 
-      mockMvc.perform(post("/auth/register")
-          .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(userJson).with(csrf()))
-          .andExpect(MockMvcResultMatchers.status().isBadRequest())
-          .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
-
+    mockMvc.perform(post("/auth/register")
+        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(userJson).with(csrf()))
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException ));
 
   }
 
@@ -120,7 +116,7 @@ public class UserControllerIntegrationTest {
           .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonU).with(csrf()))
           .andExpect(MockMvcResultMatchers.status().isBadRequest())
           .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
-          .andExpect(result ->assertTrue(result.getResolvedException() instanceof ResponseStatusException));
+          .andExpect(result ->assertTrue(result.getResolvedException() instanceof UserNameAlreadyExistException));
   }
 
   @Test
@@ -135,42 +131,35 @@ public class UserControllerIntegrationTest {
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonU).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Email already exists"))
-        .andExpect(result ->assertTrue(result.getResolvedException() instanceof ResponseStatusException));
+        .andExpect(result ->assertTrue(result.getResolvedException() instanceof EmailAlreadyExistException));
   }
 
-  @Test
-  public void postLogin() throws Exception {
-    User u = createUser("testuser123","tesR123456!","testUser123@email.com");
-
-    try{
-      registrationSetupForLogin(u);
-    }catch(Exception e){
-      System.out.println(e.getMessage());
-    }
-
-    String jsonUser = createUserJson(u);
-
-    mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
-        .andExpect(MockMvcResultMatchers.status().isOk());
-
-  }
 
   @Test
   public void postLoginShouldFail_WhenWrongCredentials() throws Exception {
     User u = createUser("testuser","tesR123456!","testUser@email.com");
-
-    try{
-      registrationSetupForLogin(u);
-    }catch(Exception e){
-      System.out.println(e.getMessage());
-    }
-
-    String jsonUser = createUserJson(createUser("testuser","tesR12","testUser@email.com"));
+    registrationSetupForLogin(u);
+    User loginUser = new User();
+    loginUser.setUsername("testuser");
+    loginUser.setPassword("tesR12");
+    String jsonUser = createUserJson(loginUser);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
-        .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadCredentialsException));
+
+  }
+
+  @Test
+  public void loginUser() throws Exception {
+    User u = createUser("userTest12","test12341!","validTestEmai@email.com");
+    String jsonUser = createUserJson(u);
+    registrationSetupForLogin(u);
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
+        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
+        .andExpect(MockMvcResultMatchers.status().isOk());
 
   }
 

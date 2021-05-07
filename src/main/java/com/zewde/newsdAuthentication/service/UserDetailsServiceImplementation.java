@@ -44,15 +44,14 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
   public User loadUserByUsername(String username)throws UsernameNotFoundException, UserLoginBlockedException{
 
     String ipAddress = loginFailureService.getIpAddress();
-
     if(loginFailureService.isBlocked(ipAddress)){
       throw new UserLoginBlockedException();
     }
-      Optional<User> user = userRepository.findByUsername(username);
-      user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
-      return user.map(User::new).get();
+    Optional<User> user = userRepository.findByUsername(username);
+    user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
+    return user.map(User::new).get();
   }
 
 
@@ -69,10 +68,8 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     Optional<User> user = userRepository.findByUsername(username);
     user.orElseThrow(() -> new UsernameNotFoundException("UserName not found"));
 
-     return user.map(User::new).get();
+    return user.map(User::new).get();
   }
-
-
 
   public RegistrationConfirmationToken registerUserAndReturnToken(User u) throws EmailAlreadyExistException, UserNameAlreadyExistException {
     RegistrationConfirmationToken registrationToken = null;
@@ -88,25 +85,22 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     newUser.setEmail(u.getEmail());
     newUser.setPassword(passwordEncoder.encode(u.getPassword()));
     newUser.setUsername(u.getUsername());
-    newUser.setActive(true);
 
-    try{
-      userRepository.save(newUser);
-      registrationToken = new RegistrationConfirmationToken(newUser);
-      System.out.println("registration user in registration ");
-      System.out.println(registrationToken);
+    userRepository.save(newUser);
 
-      registrationTokenRepo.save(registrationToken);
-      return registrationToken;
-    }catch(Exception e){
-      System.out.println(e.getMessage());
-    }
+    registrationToken = createTokenForUser(newUser);
+    return registrationToken;
+
+  }
+
+  private RegistrationConfirmationToken createTokenForUser(User user){
+    RegistrationConfirmationToken registrationToken = new RegistrationConfirmationToken(user);
+    registrationTokenService.saveToken(registrationToken);
     return registrationToken;
   }
 
 
   public void confirmUser(String token) {
-
     RegistrationConfirmationToken userToken = registrationTokenService.getToken(token);
     User user = userToken.getUser();
     user.setEnabled(true);
@@ -117,8 +111,8 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
 
   public RegistrationConfirmationToken findTokenByUserEmail(String email){
-
     Optional<User> user = userRepository.findUserByEmail(email);
+
     user.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
     return registrationTokenService.findTokenByUser(user);

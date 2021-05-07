@@ -36,9 +36,9 @@ public class LoginFailureService {
   }
 
   public void loginFailed(String ipAddress){
-    int tries = 0;
+    int tries;
     try{
-      tries =  cachedAttempts.get(ipAddress);
+      tries = cachedAttempts.get(ipAddress);
     }catch(ExecutionException e){
       tries = 0;
     }
@@ -46,9 +46,9 @@ public class LoginFailureService {
     cachedAttempts.put(ipAddress, tries);
   }
 
-  public boolean isBlocked(String ipAddresse){
+  public boolean isBlocked(String ipAddress){
     try{
-      return cachedAttempts.get(ipAddresse) >= MAX_ATTEMPTS;
+      return cachedAttempts.get(ipAddress) >= MAX_ATTEMPTS;
     }catch(ExecutionException e){
       return false;
     }
@@ -61,7 +61,6 @@ public class LoginFailureService {
       return xForwardHeader.split(",")[0];
     }else
       return request.getRemoteAddr();
-
   }
 
 }

@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +27,6 @@ import java.util.Set;
 public class ArticleJsonFilter extends OncePerRequestFilter {
   private final static Logger logger = LoggerFactory.getLogger(ArticleJsonFilter.class);
 
-
   @Override
   protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
     System.out.println("################ Initialising Article Filter ##################");
@@ -37,26 +37,21 @@ public class ArticleJsonFilter extends OncePerRequestFilter {
       logger.info("Validating data for request: {}", cachedArticleRequest.getRequestURI());
       logger.info("Request protocol from : {}", cachedArticleRequest.getProtocol());
 
-      InputStream schemaAsStream = ArticleJsonFilter.class.getClassLoader().getResourceAsStream("jsonSchema/article.schema.json");
+      JsonSchema articleSchema = createJsonSchema();
+      JsonNode articleJson = createJsonNode(cachedArticleRequest.getInputStream());
 
-      JsonSchema schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(schemaAsStream);
-
-      ObjectMapper om = new ObjectMapper();
-      om.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
-      JsonNode jsonNode = om.readTree(cachedArticleRequest.getInputStream());
-
-      Set<ValidationMessage> errors = schema.validate(jsonNode);
-      StringBuilder errorsCombined = new StringBuilder();
+      Set<ValidationMessage> errors = articleSchema.validate(articleJson);
+      StringBuilder errorOutput = new StringBuilder();
 
       for(ValidationMessage error : errors){
-        logger.error("Article Validation Erroro : {}", error);
-        errorsCombined.append(error.toString()).append("\n");
+        logger.error("Article Validation Error : {}", error);
+        errorOutput.append(error.toString()).append("\n");
       }
 
       if(errors.size() > 0)
       {
-        logger.error("Errors in Article Data : \n {}", errorsCombined);
-        httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,"Article Data are not valid! Article cannot stored");
+        logger.error("Errors in Article Data : \n {}", errorOutput);
+        httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,"Article Data are not valid! Article cannot be stored");
       }else{
         logger.info("Successfully validated article");
         System.out.println("################ End of Article Filter ##################");
@@ -80,5 +75,19 @@ public class ArticleJsonFilter extends OncePerRequestFilter {
     logger.info("Url is filtered" + urls.contains(path));
 
     return urls.contains(path);
+  }
+
+  private JsonSchema createJsonSchema(){
+    InputStream jsonValidationSchemaAsStream = ArticleJsonFilter.class.getClassLoader().getResourceAsStream("jsonSchema/article.schema.json");
+    JsonSchema schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(jsonValidationSchemaAsStream);
+    return schema;
+  }
+
+  private JsonNode createJsonNode(ServletInputStream inputStream) throws IOException {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
+    return objectMapper.readTree(inputStream);
+
   }
 }

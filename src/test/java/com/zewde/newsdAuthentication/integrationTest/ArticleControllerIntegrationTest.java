@@ -32,27 +32,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//import org.junit.BeforeClass;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureMockMvc
-//@WebMvcTest(ArticleController.class)
 @SpringBootTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ArticleControllerIntegrationTest {
 
-  //  @Autowired
   private MockMvc mockMvc;
 
   @Autowired
   private WebApplicationContext context;
-
-//  @Autowired
-//  private WebApplicationContext context;
 
   @Autowired
   private UserRepository userRepository;
@@ -63,12 +52,9 @@ public class ArticleControllerIntegrationTest {
   @Autowired
   private JWTTokenUtils jwtTokenUtils;
 
-
-
   private String USERNAME = "someTestUser";
 
   private Principal mockPrinciple;
-
 
 
   @BeforeAll
@@ -81,11 +67,6 @@ public class ArticleControllerIntegrationTest {
 
     userRepository.save(user);
 
-//
-//    mockMvc = MockMvcBuilders
-//        .webAppContextSetup(context)
-//        .apply(springSecurity())
-//        .build();
   }
   @BeforeEach
   public void setUp(){
@@ -120,86 +101,7 @@ public class ArticleControllerIntegrationTest {
     String jsonArticle = om.writeValueAsString(article);
 
     this.mockMvc.perform(post("/articles").contentType(MediaType.APPLICATION_JSON).content(jsonArticle).with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
-        .andExpect(status().isBadRequest()).andExpect(status().reason("Article Data are not valid! Article cannot stored"));
+        .andExpect(status().isBadRequest()).andExpect(status().reason("Article Data are not valid! Article cannot be stored"));
 
   }
-//  @Test
-//  public void shouldReturn201_WhenPostingValidArticle() throws Exception{
-//    User user = userRepository.findByUsername(USERNAME).get();
-//    String token = jwtTokenUtils.generateToken(USERNAME);
-//
-//    Article article = new Article("2", user.getId(),"kitv.com","other  author","other title", "other summary","http://www.kitv.com/story/42196143/to-cap-off-his-amazing-week-", "2020-06-01 16:11:00", "tpoic", "EN", "en", "12345","Copyright 2000 - ",true);
-//
-//    ObjectMapper om = new ObjectMapper();
-//    String jsonArticle = om.writeValueAsString(article);
-//
-//    this.mockMvc.perform(post("/articles?username="+USERNAME).content(jsonArticle).contentType(MediaType.APPLICATION_JSON).characterEncoding("UTF-8").with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print())
-//        .andExpect(status().isOk());
-//
-//  }
-
-
-//     Article article = new Article("2", user.getId(),"kitv.com","other  author","other title", "other summary","http://www.kitv.com/story/42196143/to-cap-off-his-amazing-week-", "2020-06-01 16:11:00", "tpoic", "EN", "en", "12345","Copyright 2000 - ",true);
-
-
-
-//
-//  @Test
-//  public void getArticlesPerUser() throws Exception {
-//    User user = userRepository.findByUsername(USERNAME).get();
-//    articleRepository.save(new Article("1", user.getId(),"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true));
-//    articleRepository.save(new Article("2", user.getId(),"other clean_url","other  author","other title", "other summary","other link", "other published+at", " other topic", "EN", "en", "12345","all rights",true));
-//
-//
-//    String token = jwtTokenUtils.generateToken(USERNAME);
-//
-//    ArrayList<Article> art = articleRepository.findAllByUserId(user.getId());
-//    System.out.println(art);
-//
-//    mockMvc.perform(MockMvcRequestBuilders.get("/articles?username="+USERNAME).contentType(MediaType.APPLICATION_JSON).with(csrf()).cookie(new Cookie("jwtToken", token)))
-//        .andExpect(MockMvcResultMatchers.status().isOk())
-//        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value(1))
-//        .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("some title"));
-//
-//
-//  }
-//
-//  @Test
-//  public void postArticleForUser() throws Exception {
-//    User user = userRepository.findByUsername(USERNAME).get();
-//
-//    Article article = new Article("4", user.getId(),"kitv.com","author","some title", "By Chris Isidore, CNN Business Elon..","http://www.kitv.com/story/42196143/to-cap-", "2020-06-01 16:11:00", "NA", "DE", "de", "1234","Copyright 2000 - 2020 WorldNow and KITV",true);
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    String json = mapper.writeValueAsString(article);
-//    String token = jwtTokenUtils.generateToken(USERNAME);
-//
-//
-//      mockMvc.perform(post("/articles?username="+USERNAME).content(json)
-//          .with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print()).andExpect(status().isOk());
-
-
-//    mockMvc.perform(post("/articles?username="+USERNAME).content(json).contentType(MediaType.APPLICATION_JSON_VALUE).characterEncoding("utf-8")
-//        .with(csrf()).cookie(new Cookie("jwtToken", token))).andDo(print()).andExpect(status().isOk());
-//          .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-//          .andExpect(MockMvcResultMatchers.jsonPath("$[0]._id").value(1))
-//          .andExpect(MockMvcResultMatchers.jsonPath("$[0].clean_url").value("kitv.com"));
-
-//  }
-
-//  @Test
-//  public void shouldThrowError_whenArticleDataIsInvalid() throws Exception {
-//
-//    Article article = new Article("5", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
-//    ObjectMapper mapper = new ObjectMapper();
-//    String json = mapper.writeValueAsString(article);
-//    String token = jwtTokenUtils.generateToken(USERNAME);
-//
-//    mockMvc.perform(post("/articles?username="+USERNAME).contentType(MediaType.APPLICATION_JSON).content(json).with(csrf()).cookie(new Cookie("jwtToken", token)))
-//        .andExpect(MockMvcResultMatchers.status().isBadRequest());
-//
-//  }
-
-
 }

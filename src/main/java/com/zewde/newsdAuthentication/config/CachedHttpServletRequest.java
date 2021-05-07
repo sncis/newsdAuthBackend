@@ -21,7 +21,6 @@ public CachedHttpServletRequest(HttpServletRequest request) throws IOException {
   @Override
   public ServletInputStream getInputStream() throws  IOException{
     return new CachedServletInputStream(this.cachedBody);
-
   }
 
   @Override

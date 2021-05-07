@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.zewde.newsdAuthentication.utils.validators.ValidEmail;
 import com.zewde.newsdAuthentication.utils.validators.ValidPassword;
+import com.zewde.newsdAuthentication.utils.validators.ValidUsername;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +36,7 @@ public class User implements UserDetails {
 
   @NotNull
   @NotEmpty
+  @ValidUsername
   @Column(name="username")
   private String username;
 
@@ -56,7 +58,7 @@ public class User implements UserDetails {
   private boolean isEnabled = false;
 
   @Column(name="active")
-  private boolean active;
+  private boolean active = true;
 
   @JsonDeserialize(as = GrantedAuthority.class)
   @JsonIgnore

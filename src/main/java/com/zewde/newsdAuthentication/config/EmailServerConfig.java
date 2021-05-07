@@ -38,11 +38,11 @@ public class EmailServerConfig {
     mailSender.setUsername(mailServerUsername);
     mailSender.setPassword(mailServerPassword);
 
-    Properties props = mailSender.getJavaMailProperties();
-    props.put("mail.transport.protocol", "smtp");
-    props.put("mail.smtp.auth", "true");
-    props.put("mail.smtp.starttls.enable", "true");
-    props.put("mail.debug", "true");
+    Properties mailProperties = mailSender.getJavaMailProperties();
+    mailProperties.put("mail.transport.protocol", "smtp");
+    mailProperties.put("mail.smtp.auth", "true");
+    mailProperties.put("mail.smtp.starttls.enable", "true");
+    mailProperties.put("mail.debug", "true");
 
     return mailSender;
   }
@@ -53,7 +53,6 @@ public class EmailServerConfig {
 
     message.setText("Hi from Newsdme \n please click the link below to confirm your registration.\n\n\n\n" +
         frontendUrl+"/confirm/2?token=%s\n");
-
     return message;
   }
 

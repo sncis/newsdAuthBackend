@@ -1,6 +1,5 @@
 package com.zewde.newsdAuthentication.controller;
 
-import com.zewde.newsdAuthentication.Exceptions.ArticleNotFoundException;
 import com.zewde.newsdAuthentication.entities.Article;
 import com.zewde.newsdAuthentication.service.ArticleService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
@@ -12,9 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -49,32 +46,18 @@ public class ArticleController {
   public ResponseEntity<?> getArticlesPerUser(Principal principal){
     ArrayList<Article> articles;
 
-    try{
-      articles= articleService.getArticlesByUsername(principal.getName());
-    }catch(UsernameNotFoundException e){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no such username",e);
-    }catch(Exception e ){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong",e);
-    }
+    articles= articleService.getArticlesByUsername(principal.getName());
+
     return new ResponseEntity<>(articles, HttpStatus.OK);
   }
 
   @PostMapping("/articles")
   public ResponseEntity<?> saveBookmarkedArticles(Principal principal, @RequestBody Article article){
-    Article savedArticle = null;
 
-    try{
     int userId = userService.findUserIdByUsername(principal.getName());
     article.setUserId(userId);
-    savedArticle = articleService.saveBookmarkedArticle(article);
+    Article savedArticle = articleService.saveBookmarkedArticle(article);
 
-    }catch(UsernameNotFoundException e){
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no user with such username found", e);
-    }
-    catch(Exception e){
-      logger.error("Error when storing article : " + e.getMessage());
-      logger.error("Error cause by : " + e.getCause());
-    }
     return new ResponseEntity<>(savedArticle, HttpStatus.CREATED);
   }
 
@@ -82,11 +65,7 @@ public class ArticleController {
 
   @DeleteMapping("/articles/article")
   public ResponseEntity<?> deleteUnbookmarkedArticle(@RequestParam("id") String id){
-    try{
-      articleService.deleteUnbookmarkedArticle(id);
-    }catch(ArticleNotFoundException e){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND,String.format("No Article with id=%s",id),e);
-    }
+    articleService.deleteUnbookmarkedArticle(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

@@ -19,6 +19,7 @@ public class CachedServletInputStream extends ServletInputStream {
     try {
       return cachedInputStream.available() == 0;
     } catch (IOException e) {
+
       e.printStackTrace();
     }
     return false;

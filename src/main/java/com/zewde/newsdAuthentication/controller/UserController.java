@@ -3,15 +3,13 @@ package com.zewde.newsdAuthentication.controller;
 
 import com.zewde.newsdAuthentication.Exceptions.EmailAlreadyExistException;
 import com.zewde.newsdAuthentication.Exceptions.UserNameAlreadyExistException;
+import com.zewde.newsdAuthentication.entities.LoginUser;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.EmailService;
-import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -35,8 +32,6 @@ import java.util.Objects;
 
 public class UserController {
 
-  private final static Logger logger = LoggerFactory.getLogger(UserController.class);
-
   @Autowired
   private UserDetailsServiceImplementation userService;
 
@@ -48,10 +43,6 @@ public class UserController {
 
   @Autowired
   private CookiesUtils cookiesUtils;
-
-  @Autowired
-  private RegistrationConfirmationTokenService registrationConfirmationTokenService;
-
 
   @Autowired
   public SimpleMailMessage mailMessage;
@@ -67,25 +58,13 @@ public class UserController {
 
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody User user) throws UserNameAlreadyExistException, EmailAlreadyExistException, IOException, MessagingException {
-    RegistrationConfirmationToken token;
-    String textMail;
-
-    try{
-      token = userService.registerUserAndReturnToken(user);
-      textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token.getToken());
-
-    }catch(EmailAlreadyExistException e){
-      System.out.println(e);
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists", e);
-    } catch(UserNameAlreadyExistException e){
-      logger.info("UsernameAlreadyExist Exception was thrown");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists", e);
-    }catch(Exception e){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Sorry something went wrong from Backend",e);
-    }
+    RegistrationConfirmationToken token = userService.registerUserAndReturnToken(user);
+    String textMail = String.format(Objects.requireNonNull(mailMessage.getText()), token.getToken());
 
     emailService.sendEmail(user.getEmail(),"Confirm newsdMe registration", textMail);
-    return new ResponseEntity<>("",HttpStatus.CREATED);
+
+    return new ResponseEntity<>(HttpStatus.CREATED);
+
   }
 
   @GetMapping("/login")
@@ -95,13 +74,13 @@ public class UserController {
 
 
   @PostMapping("/login")
-  public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletResponse response){
+  public ResponseEntity<?> loginUser(@RequestBody LoginUser user, HttpServletResponse response){
 
     Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
-    String token = jwtTokenUtils.generateToken(auth.getName());
-    Cookie cookie = cookiesUtils.createCookie("jwtToken", token);
-    response.addCookie(cookie);
+    String jwtToken = jwtTokenUtils.generateToken(auth.getName());
+    Cookie cookie = cookiesUtils.createCookie("jwtToken", jwtToken);
 
+    response.addCookie(cookie);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

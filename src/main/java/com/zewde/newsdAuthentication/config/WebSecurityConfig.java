@@ -48,6 +48,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   CustomJwtExceptionHandlerForEntryPoint customJWTEntryPoint;
 
+  @Autowired
+  CustomAccessDeniedHandler customAccessDeniedHandler;
+
   @Value("${frontend.url}")
   private String frontendUrl;
 
@@ -83,6 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(articleJsonFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(authenticationFilter, BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(customJWTEntryPoint)
+            .and().exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
            .and().httpBasic();
 

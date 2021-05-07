@@ -7,7 +7,6 @@ import com.zewde.newsdAuthentication.controller.UserController;
 import com.zewde.newsdAuthentication.entities.RegistrationConfirmationToken;
 import com.zewde.newsdAuthentication.entities.User;
 import com.zewde.newsdAuthentication.service.EmailService;
-import com.zewde.newsdAuthentication.service.RegistrationConfirmationTokenService;
 import com.zewde.newsdAuthentication.service.UserDetailsServiceImplementation;
 import com.zewde.newsdAuthentication.utils.CookiesUtils;
 import com.zewde.newsdAuthentication.utils.JWTTokenUtils;
@@ -31,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.servlet.http.Cookie;
 
@@ -46,10 +45,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//@ActiveProfiles("test")
 @WebMvcTest
 @ActiveProfiles("test")
 @RunWith(MockitoJUnitRunner.class)
@@ -70,8 +65,6 @@ public class UserControllerTest {
   @Mock
   private CookiesUtils cookiesUtils;
 
-  @Mock
-  private RegistrationConfirmationTokenService registrationConfirmationTokenService;
 
   @Mock
   private EmailService emailService;
@@ -93,7 +86,7 @@ public class UserControllerTest {
 
   }
 
-  private User createUser(){
+  private User createRegistrationUser(){
     User u = new User();
     u.setUsername("someUser");
     u.setPassword("Pass123!");
@@ -103,13 +96,11 @@ public class UserControllerTest {
   }
 
 
-
   @Before
   public void setUp() throws Exception {
     mockMvc = MockMvcBuilders.standaloneSetup(userController).setControllerAdvice(new MyControllerAdvice())
         .build();
-
-    user = createUser();
+    user = createRegistrationUser();
     jsonUser = createUserJson(user);
 
   }
@@ -132,7 +123,6 @@ public class UserControllerTest {
     mockMvc.perform(post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isCreated());
-//        .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("someUser"));
   }
 
   @Test
@@ -157,25 +147,27 @@ public class UserControllerTest {
 
   @Test
   public void shouldThrowErrorWhenNoValidCredentials()throws Exception {
+    User u = new User();
+    u.setUsername("so");
+    u.setEmail("email.com");
+    u.setPassword("somepas");
 
+    String userJson = createUserJson(u);
     mockMvc.perform(post("/auth/register")
-        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
+        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(userJson).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
-        .andExpect(result ->assertTrue(result.getResolvedException() instanceof ResponseStatusException ));
+        .andExpect(result ->assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
   }
 
   @Test
   public void shouldThrowEmailAlreadyExistException_WhenUserTryToRegisterWithExistingEmail() throws Exception {
     when(userService.registerUserAndReturnToken(any(User.class))).thenThrow(new EmailAlreadyExistException());
 
-//    User user = createUser();
-//    String userJSON = createUserJson(user);
-
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Email already exists"))
-        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailAlreadyExistException));
 
   }
 
@@ -187,7 +179,7 @@ public class UserControllerTest {
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isBadRequest())
         .andExpect(MockMvcResultMatchers.status().reason("Username already exists"))
-        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNameAlreadyExistException));
   }
 
   @Test
@@ -207,7 +199,6 @@ public class UserControllerTest {
   }
 
 
-//  @Test(expected = BadCredentialsException.class)
   @Test
   public void shouldThrowBadCredentialsException_WhenCredentialsAreWrong() throws Exception {
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Bad creds"));
@@ -254,18 +245,9 @@ public class UserControllerTest {
 
     mockMvc.perform(MockMvcRequestBuilders.get("/auth/confirm?token=InvalidToken")
         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).with(csrf())).andDo(print())
-        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-        .andExpect(result -> assertEquals(result.getResponse().getContentAsString(),"Your account is disabled. Please confirm your Registration."));
+        .andExpect(MockMvcResultMatchers.status().isNotFound())
+        .andExpect(result -> assertEquals(result.getResponse().getContentAsString(),"No registration token found. Please Login or Register"));
   }
 
-//  @Test
-//  public void resendConfirmationToken() throws Exception {
-//    doThrow( new RegistrationConfirmationTokenNotFoundException()).when(userService).confirmUser(any(String.class));
-//
-//    mockMvc.perform(MockMvcRequestBuilders.get("/auth/confirm?token=InvalidToken")
-//        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).with(csrf())).andDo(print())
-//        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-//        .andExpect(result -> assertEquals(result.getResponse().getContentAsString(),"Your account is disabled. Please confirm your Registration."));
-//  }
 
 }
