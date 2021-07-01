@@ -52,7 +52,7 @@ public class ArticleControllerIntegrationTest {
   @Autowired
   private JWTTokenUtils jwtTokenUtils;
 
-  private String USERNAME = "someTestUser";
+  private final String USERNAME = "someTestUser";
 
   private Principal mockPrinciple;
 

@@ -26,19 +26,11 @@ public class ArticleService {
 
   public ArrayList<Article> getArticlesByUsername(String userName) {
     int userId;
-    ArrayList<Article> articles = null;
+//    ArrayList<Article> articles = null;
 
-//    try{
-      userId = userService.createUserByUsername(userName).getId();
-      articles = articleRepository.findAllByUserId(userId);
-//
-//    }catch(
-//  UsernameNotFoundException e){
-//      throw new UsernameNotFoundException("no such user");
-//    }catch(Exception e){
-//      System.out.println(e.getMessage());
-//    }
-    return articles;
+    userId = userService.createUserByUsername(userName).getId();
+//    articles = articleRepository.findAllByUserId(userId);
+    return articleRepository.findAllByUserId(userId);
   }
 
   public void deleteUnbookmarkedArticle(String articleId) throws ArticleNotFoundException{

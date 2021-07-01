@@ -90,8 +90,8 @@ public class ArticleControllerTest {
   public void saveBookmarkedArticles() throws Exception {
     Article article1 = new Article("1", 1,"clean_url","some  author","some title", "some summary","some link", "some published+at", "topic", "DE", "de", "1234","all rights",true);
     String json = new ObjectMapper().writeValueAsString(article1);
-    when(mockPrinciple.getName()).thenReturn("someUser");
 
+    when(mockPrinciple.getName()).thenReturn("someUser");
     when(userService.findUserIdByUsername(any(String.class))).thenReturn(1);
     when(articleService.saveBookmarkedArticle(any(Article.class))).thenReturn(article1);
 

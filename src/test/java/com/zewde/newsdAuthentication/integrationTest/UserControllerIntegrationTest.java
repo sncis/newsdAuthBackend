@@ -160,7 +160,5 @@ public class UserControllerIntegrationTest {
     mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE).content(jsonUser).with(csrf()))
         .andExpect(MockMvcResultMatchers.status().isOk());
-
   }
-
 }

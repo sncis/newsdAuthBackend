@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -89,13 +88,4 @@ public class ArticleRepositoryTest {
     assertEquals(articles.size(), 0);
   }
 
-  @Test
-  public void passwordTest(){
-    String pass = "adminPassword1234!";
-    String epass = passwordEncoder.encode(pass);
-    System.out.println("******");
-    System.out.println(epass);
-
-    assertTrue(passwordEncoder.matches(pass,epass));
-  }
 }

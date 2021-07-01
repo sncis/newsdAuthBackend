@@ -37,7 +37,7 @@ public class RegistrationConfirmationTokenService {
 
 
   public RegistrationConfirmationToken findTokenByUser(Optional<User> user){
-    Optional <RegistrationConfirmationToken> token =  tokenRepo.findRegistrationConfirmationTokenByUser(user);
+    Optional <RegistrationConfirmationToken> token = tokenRepo.findRegistrationConfirmationTokenByUser(user);
 
     token.orElseThrow(RegistrationConfirmationTokenNotFoundException::new);
 

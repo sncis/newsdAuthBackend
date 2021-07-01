@@ -146,7 +146,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldThrowErrorWhenNoValidCredentials()throws Exception {
+  public void shouldThrowError_WhenNoValidCredentials()throws Exception {
     User u = new User();
     u.setUsername("so");
     u.setEmail("email.com");

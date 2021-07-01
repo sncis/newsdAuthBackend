@@ -42,12 +42,9 @@ private final static Logger logger = LoggerFactory.getLogger(ArticleJsonFilterTe
 
     Article article = new Article("1","kitv.com","author","some title", "By Chris Isidore, CNN Business Elon..","http://www.kitv.com/story/42196143/to-cap-", "2020-06-01 16:11:00", "NA", "DE", "de", "1234","Copyright 2000 - 2020 WorldNow and KITV",true);
 
-    System.out.println(article);
     JsonSchema schema = getSchema();
     JsonNode jsonNode = createJsonNode(article);
-    System.out.println(jsonNode);
 
-    logger.info(String.valueOf(jsonNode));
     Set<ValidationMessage> error = schema.validate(jsonNode);
 
     logger.info(String.valueOf(error));
