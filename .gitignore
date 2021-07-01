@@ -10,7 +10,6 @@ mvnw.cmd
 
 
 create.sql
-#application-dev.properties
 #application-test.properties
 
 ### STS ###
